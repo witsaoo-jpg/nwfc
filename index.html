@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nursing Staff Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
+        /* CSS Class สำหรับสร้างเส้นเศษส่วน */
+        .fraction { display: inline-block; text-align: center; vertical-align: middle; margin: 0 0.2em; }
+        .fraction > span { display: block; padding-top: 0.1em; }
+        .fraction span.numerator { border-bottom: 2px solid white; }
+        .fraction span.denominator { border-top: 2px solid transparent; }
+    </style>
+</head>
+<body class="p-6">
+
+    <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        
+        <!-- Header -->
+        <div class="bg-blue-600 p-6 text-white">
+            <h1 class="text-2xl font-bold">🏥 คำนวณอัตรากำลังพยาบาล</h1>
+            <p class="text-blue-100 text-sm">Nursing Workforce Calculation System</p>
+        </div>
+
+        <div class="p-6 space-y-6">
+            
+            <!-- Section 1: Inputs -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทหอผู้ป่วย (Ward Type)</label>
+                    <select id="wardType" onchange="updatePreset()" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <option value="custom">-- กำหนดเอง --</option>
+                        <option value="ward_gen">หอผู้ป่วยสามัญ (General Ward)</option>
+                        <option value="icu">หอผู้ป่วยวิกฤต (ICU)</option>
+                        <option value="opd">ผู้ป่วยนอก (OPD)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">จำนวนผู้ป่วยเฉลี่ย (ADC)</label>
+                    <input type="number" id="adc" value="30" oninput="calculate()" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+
+            <!-- Section 2: Parameters -->
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">ตัวแปรการคำนวณ (Parameters)</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-500">NHPPD (ชม.)</label>
+                        <input type="number" step="0.1" id="nhppd" value="3.5" oninput="calculate()" class="w-full p-1 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500">ค่าคงที่ (Constant)</label>
+                        <input type="number" step="0.1" id="constant" value="1.4" oninput="calculate()" class="w-full p-1 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500">Benefit FTE</label>
+                        <input type="number" step="0.01" id="benefit" value="1.14" oninput="calculate()" class="w-full p-1 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500">ชม.ทำงาน/วัน</label>
+                        <input type="number" id="workHours" value="7" oninput="calculate()" class="w-full p-1 border rounded">
+                    </div>
+                </div>
+                <p class="text-xs text-gray-400 mt-2">*สูตร: (ADC x NHPPD x Constant x Benefit) / Work Hours</p>
+            </div>
+
+            <hr>
+
+            <!-- Section 3: FTE Result -->
+            <div class="text-center">
+                <p class="text-gray-500 mb-1">ภาระงาน FTE (FTE Requirements)</p>
+                <h2 class="text-5xl font-bold text-gray-700" id="totalStaff">0.00</h2>
+                <p class="text-gray-500 mt-1">FTE</p>
+            </div>
+
+            <!-- ⭐ NEW SECTION: สูตรคำนวณคนตามรูปภาพ ⭐ -->
+            <div class="bg-gray-800 text-white rounded-xl p-6 shadow-inner relative overflow-hidden">
+                <!-- Decoration -->
+                <div class="absolute top-0 right-0 -mt-2 -mr-2 w-24 h-24 bg-white opacity-5 rounded-full blur-xl"></div>
+                
+                <h3 class="text-center text-yellow-400 text-sm font-semibold mb-4 uppercase tracking-widest">
+                    คำนวณจำนวนคน (Headcount)
+                </h3>
+
+                <!-- The Formula Display -->
+                <div class="flex flex-col items-center justify-center mb-4">
+                    <div class="text-xl md:text-2xl font-serif italic flex items-center">
+                        <span class="mr-3">จำนวนคน = </span>
+                        <div class="fraction">
+                            <span class="numerator px-2">FTE × 2,368</span>
+                            <span class="denominator">2,080</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- The Result -->
+                <div class="text-center mt-2">
+                    <div class="inline-block bg-gray-700 px-6 py-2 rounded-lg border border-gray-600">
+                        <span class="text-4xl font-bold text-green-400" id="headCountResult">0.00</span>
+                        <span class="text-lg text-gray-300 ml-2">คน</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-3" id="formulaDetail">
+                        ( 0.00 x 2,368 ) / 2,080
+                    </p>
+                </div>
+            </div>
+            <!-- ⭐ END NEW SECTION ⭐ -->
+
+            <!-- Section 4: Shift Plan -->
+            <div class="bg-blue-50 p-4 rounded-lg">
+                <h3 class="text-blue-800 font-semibold mb-2">แนะนำการจัดเวร (Daily Shift Plan)</h3>
+                <div class="grid grid-cols-3 gap-2 text-center">
+                    <div class="bg-white p-2 rounded shadow-sm">
+                        <p class="text-xs text-gray-500">เวรเช้า (60%)</p>
+                        <p class="text-xl font-bold text-blue-600" id="shiftMorning">0</p>
+                    </div>
+                    <div class="bg-white p-2 rounded shadow-sm">
+                        <p class="text-xs text-gray-500">เวรบ่าย (25%)</p>
+                        <p class="text-xl font-bold text-blue-600" id="shiftAfternoon">0</p>
+                    </div>
+                    <div class="bg-white p-2 rounded shadow-sm">
+                        <p class="text-xs text-gray-500">เวรดึก (15%)</p>
+                        <p class="text-xl font-bold text-blue-600" id="shiftNight">0</p>
+                    </div>
+                </div>
+                <p class="text-xs text-blue-400 mt-2 text-center">*หมายเหตุ: คำนวณจากจำนวนคนที่ขึ้นปฏิบัติงานจริงต่อวัน (Daily Working Staff)</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer with Visitor Counter -->
+    <div class="text-center mt-6 mb-8 text-gray-500 space-y-2">
+        
+        <!-- VISITOR COUNTER SECTION -->
+        <div class="inline-flex items-center bg-white px-3 py-1 rounded-full shadow-sm border border-gray-200 text-xs">
+            <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+            <span class="mr-1">ผู้เข้าใช้งาน:</span>
+            
+            <!-- พื้นที่สำหรับวางโค้ดนับจำนวนคนจริง (Real Counter Widget Area) -->
+            <div id="visitor-counter-widget" class="font-bold text-blue-600">
+                <!-- 
+                    🔴 คำแนะนำสำหรับ GitHub Pages:
+                    1. ไปที่เว็บแจก Counter ฟรี เช่น www.hitwebcounter.com หรือ www.free-counters.org
+                    2. เลือกรูปแบบที่ชอบ แล้ว Copy HTML Code มา
+                    3. ลบโค้ด <span id="demo-counter">...</span> ด้านล่างนี้ออก
+                    4. วางโค้ดที่ Copy มา ลงไปแทนที่ตรงนี้เลย
+                -->
+                <span id="demo-counter">0</span> <!-- ตัว demo (นับเฉพาะเครื่องนี้) -->
+            </div>
+        </div>
+
+        <div class="text-sm font-medium opacity-75">
+            Copyright &copy; by witsao oya
+        </div>
+    </div>
+
+    <script>
+        // --- ส่วนของ Visitor Counter (Demo Mode) ---
+        // ฟังก์ชันนี้ใช้นับจำนวนการเปิดหน้าเว็บแบบจำลอง (เก็บใน LocalStorage ของเครื่องผู้ใช้)
+        function initDemoCounter() {
+            // เช็คว่ามีค่าเก่าไหม
+            let count = localStorage.getItem('page_views') || 0;
+            count = parseInt(count) + 1; // เพิ่มค่าทีละ 1
+            
+            // บันทึกกลับลงเครื่อง
+            localStorage.setItem('page_views', count);
+            
+            // แสดงผล
+            const counterElement = document.getElementById('demo-counter');
+            if (counterElement) {
+                counterElement.innerText = count.toLocaleString();
+            }
+        }
+        
+        // เรียกใช้งานฟังก์ชันนับจำนวนเมื่อเปิดเว็บ
+        initDemoCounter();
+        // -------------------------------------------
+
+        // ฟังก์ชันตั้งค่า NHPPD ตามประเภทหอผู้ป่วย
+        function updatePreset() {
+            const type = document.getElementById('wardType').value;
+            const nhppdInput = document.getElementById('nhppd');
+            
+            if (type === 'ward_gen') nhppdInput.value = 3.5;
+            else if (type === 'icu') nhppdInput.value = 12.0;
+            else if (type === 'opd') nhppdInput.value = 0.5;
+            
+            calculate(); 
+        }
+
+        // ฟังก์ชันคำนวณหลัก
+        function calculate() {
+            // 1. ดึงค่าจาก Input
+            let adc = parseFloat(document.getElementById('adc').value) || 0;
+            let nhppd = parseFloat(document.getElementById('nhppd').value) || 0;
+            let constant = parseFloat(document.getElementById('constant').value) || 0;
+            let benefit = parseFloat(document.getElementById('benefit').value) || 0;
+            let hours = parseFloat(document.getElementById('workHours').value) || 1;
+
+            // 2. คำนวณ FTE
+            let totalFTE = (adc * nhppd * constant * benefit) / hours;
+
+            // 3. แสดงผล FTE
+            document.getElementById('totalStaff').innerText = totalFTE.toFixed(2);
+
+            // 4. คำนวณจำนวนคน (Headcount) ตามสูตรในรูปภาพ
+            // สูตร: (FTE * 2368) / 2080
+            let headCount = (totalFTE * 2368) / 2080;
+            
+            // แสดงผลจำนวนคน
+            document.getElementById('headCountResult').innerText = headCount.toFixed(2);
+            // อัปเดตข้อความแสดงวิธีทำตัวเล็กๆ
+            document.getElementById('formulaDetail').innerText = 
+                `( ${totalFTE.toFixed(2)} x 2,368 ) / 2,080`;
+
+
+            // 5. คำนวณการจัดเวร (Daily Staffing)
+            // ใช้ logic เดิม: FTE / Benefit = Daily working staff
+            let dailyStaff = totalFTE / benefit; 
+            
+            document.getElementById('shiftMorning').innerText = Math.round(dailyStaff * 0.6);
+            document.getElementById('shiftAfternoon').innerText = Math.round(dailyStaff * 0.25);
+            document.getElementById('shiftNight').innerText = Math.round(dailyStaff * 0.15);
+        }
+
+        // รันครั้งแรกเมื่อเปิดหน้าเว็บ
+        calculate();
+    </script>
+
+</body>
+</html>
