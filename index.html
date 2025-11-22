@@ -37,56 +37,75 @@
                         <option value="icu">หอผู้ป่วยวิกฤต (ICU)</option>
                         <option value="opd">ผู้ป่วยนอก (OPD)</option>
                     </select>
+                    <p class="text-[10px] text-gray-400 mt-1 pl-1">เลือกเพื่อดึงค่า NHPPD มาตรฐาน</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">จำนวนผู้ป่วยเฉลี่ย (ADC)</label>
                     <input type="number" id="adc" value="30" oninput="calculate()" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <p class="text-[10px] text-gray-400 mt-1 pl-1">Average Daily Census (คน/วัน)</p>
                 </div>
             </div>
 
-            <!-- Section 2: Parameters -->
-            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h3 class="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">ตัวแปรการคำนวณ (Parameters)</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <!-- Section 2: Parameters with Knowledge Tips -->
+            <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                <h3 class="text-sm font-bold text-gray-600 mb-4 uppercase tracking-wider border-b pb-2 border-gray-200">
+                    ตัวแปรการคำนวณ (Parameters)
+                </h3>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-6">
+                    <!-- NHPPD -->
                     <div>
-                        <label class="block text-xs text-gray-500">NHPPD (ชม.)</label>
-                        <input type="number" step="0.1" id="nhppd" value="3.5" oninput="calculate()" class="w-full p-1 border rounded">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">NHPPD (ชม.)</label>
+                        <input type="number" step="0.1" id="nhppd" value="3.5" oninput="calculate()" class="w-full p-1.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500">
+                        <p class="text-[10px] text-blue-500 mt-1 leading-tight">
+                            *ชม.การพยาบาลที่ผู้ป่วยต้องการต่อวัน
+                        </p>
                     </div>
+
+                    <!-- Constant -->
                     <div>
-                        <label class="block text-xs text-gray-500">ค่าคงที่ (Constant)</label>
-                        <input type="number" step="0.1" id="constant" value="1.4" oninput="calculate()" class="w-full p-1 border rounded">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">ค่าคงที่ (Constant)</label>
+                        <input type="number" step="0.1" id="constant" value="1.4" oninput="calculate()" class="w-full p-1.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500">
+                        <p class="text-[10px] text-blue-500 mt-1 leading-tight">
+                            *ค่าเผื่อเวลาสำหรับงานทางอ้อม (Indirect Care)
+                        </p>
                     </div>
+
+                    <!-- Benefit FTE -->
                     <div>
-                        <label class="block text-xs text-gray-500">Benefit FTE</label>
-                        <input type="number" step="0.01" id="benefit" value="1.14" oninput="calculate()" class="w-full p-1 border rounded">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Benefit FTE</label>
+                        <input type="number" step="0.01" id="benefit" value="1.14" oninput="calculate()" class="w-full p-1.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500">
+                        <p class="text-[10px] text-blue-500 mt-1 leading-tight">
+                            *ค่าชดเชยวันหยุด/วันลา (Leave Relief)
+                        </p>
                     </div>
+
+                    <!-- Work Hours -->
                     <div>
-                        <label class="block text-xs text-gray-500">ชม.ทำงาน/วัน</label>
-                        <input type="number" id="workHours" value="7" oninput="calculate()" class="w-full p-1 border rounded">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">ชม.ทำงาน/วัน</label>
+                        <input type="number" id="workHours" value="7" oninput="calculate()" class="w-full p-1.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500">
+                        <p class="text-[10px] text-blue-500 mt-1 leading-tight">
+                            *เวลาทำงานจริงหักพัก (Productive Hours)
+                        </p>
                     </div>
                 </div>
-                <p class="text-xs text-gray-400 mt-2">*สูตร: (ADC x NHPPD x Constant x Benefit) / Work Hours</p>
             </div>
 
-            <hr>
+            <hr class="border-gray-100">
 
             <!-- Section 3: FTE Result -->
             <div class="text-center">
-                <p class="text-gray-500 mb-1">ภาระงาน FTE (FTE Requirements)</p>
+                <p class="text-gray-500 mb-1 text-sm">อัตรากำลัง FTE ที่ต้องการ</p>
                 <h2 class="text-5xl font-bold text-gray-700" id="totalStaff">0.00</h2>
-                <p class="text-gray-500 mt-1">FTE</p>
+                <p class="text-gray-400 text-xs mt-1 uppercase tracking-widest">Full Time Equivalent</p>
             </div>
 
-            <!-- ⭐ NEW SECTION: สูตรคำนวณคนตามรูปภาพ ⭐ -->
+            <!-- Section: Headcount Formula (Dark Box) -->
             <div class="bg-gray-800 text-white rounded-xl p-6 shadow-inner relative overflow-hidden">
-                <!-- Decoration -->
                 <div class="absolute top-0 right-0 -mt-2 -mr-2 w-24 h-24 bg-white opacity-5 rounded-full blur-xl"></div>
-                
                 <h3 class="text-center text-yellow-400 text-sm font-semibold mb-4 uppercase tracking-widest">
                     คำนวณจำนวนคน (Headcount)
                 </h3>
-
-                <!-- The Formula Display -->
                 <div class="flex flex-col items-center justify-center mb-4">
                     <div class="text-xl md:text-2xl font-serif italic flex items-center">
                         <span class="mr-3">จำนวนคน = </span>
@@ -96,8 +115,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- The Result -->
                 <div class="text-center mt-2">
                     <div class="inline-block bg-gray-700 px-6 py-2 rounded-lg border border-gray-600">
                         <span class="text-4xl font-bold text-green-400" id="headCountResult">0.00</span>
@@ -108,7 +125,6 @@
                     </p>
                 </div>
             </div>
-            <!-- ⭐ END NEW SECTION ⭐ -->
 
             <!-- Section 4: Shift Plan -->
             <div class="bg-blue-50 p-4 rounded-lg">
@@ -130,18 +146,60 @@
                 <p class="text-xs text-blue-400 mt-2 text-center">*หมายเหตุ: คำนวณจากจำนวนคนที่ขึ้นปฏิบัติงานจริงต่อวัน (Daily Working Staff)</p>
             </div>
 
+            <hr class="border-dashed border-gray-300">
+
+            <!-- ⭐ Reference Table (Warstler, 1970) ⭐ -->
+            <div class="bg-orange-50 border border-orange-100 rounded-lg p-5">
+                <h3 class="text-orange-800 font-bold text-lg mb-3 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    เกณฑ์ NHPPD ตามการจำแนกประเภทผู้ป่วย
+                </h3>
+                <p class="text-xs text-orange-600 mb-3 font-medium">(อ้างอิง: Warstler, 1970)</p>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-md overflow-hidden shadow-sm text-sm">
+                        <thead class="bg-orange-100 text-orange-900">
+                            <tr>
+                                <th class="py-2 px-4 text-left font-semibold">ประเภทผู้ป่วย (Classification)</th>
+                                <th class="py-2 px-4 text-center font-semibold">NHPPD (ชม.)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr class="hover:bg-orange-50">
+                                <td class="py-2 px-4 text-gray-700 font-medium">5. Intensive Care</td>
+                                <td class="py-2 px-4 text-center text-blue-600 font-bold">12.0</td>
+                            </tr>
+                            <tr class="hover:bg-orange-50">
+                                <td class="py-2 px-4 text-gray-700">4. Modified Intensive Care</td>
+                                <td class="py-2 px-4 text-center text-blue-600 font-bold">7.5</td>
+                            </tr>
+                            <tr class="hover:bg-orange-50">
+                                <td class="py-2 px-4 text-gray-700">3. Intermediate Care</td>
+                                <td class="py-2 px-4 text-center text-blue-600 font-bold">5.5</td>
+                            </tr>
+                            <tr class="hover:bg-orange-50">
+                                <td class="py-2 px-4 text-gray-700">2. Minimal Care</td>
+                                <td class="py-2 px-4 text-center text-blue-600 font-bold">3.5</td>
+                            </tr>
+                            <tr class="hover:bg-orange-50">
+                                <td class="py-2 px-4 text-gray-700">1. Self Care</td>
+                                <td class="py-2 px-4 text-center text-blue-600 font-bold">1.5</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <!-- Footer with Real Visitor Counter -->
     <div class="text-center mt-8 mb-8 text-gray-500 space-y-4">
         
-        <!-- Credit -->
         <div class="text-sm font-medium opacity-75">
-            Copyright &copy; by witsao oya...witsaoo@gmail.com
+            Copyright &copy; by witsao oya
         </div>
 
-        <!-- Real Counter Widget -->
         <div class="flex justify-center items-center opacity-90 hover:opacity-100 transition-opacity">
             <a href="https://www.freecounterstat.com" title="free hit counters">
                 <img src="https://counter1.optistats.ovh/private/freecounterstat.php?c=dfxnuny3jue2bh5nbg7b8nz8mg4n1hhp" border="0" title="free hit counters" alt="free hit counters">
@@ -151,7 +209,6 @@
     </div>
 
     <script>
-        // ฟังก์ชันตั้งค่า NHPPD ตามประเภทหอผู้ป่วย
         function updatePreset() {
             const type = document.getElementById('wardType').value;
             const nhppdInput = document.getElementById('nhppd');
@@ -163,34 +220,22 @@
             calculate(); 
         }
 
-        // ฟังก์ชันคำนวณหลัก
         function calculate() {
-            // 1. ดึงค่าจาก Input
             let adc = parseFloat(document.getElementById('adc').value) || 0;
             let nhppd = parseFloat(document.getElementById('nhppd').value) || 0;
             let constant = parseFloat(document.getElementById('constant').value) || 0;
             let benefit = parseFloat(document.getElementById('benefit').value) || 0;
             let hours = parseFloat(document.getElementById('workHours').value) || 1;
 
-            // 2. คำนวณ FTE
             let totalFTE = (adc * nhppd * constant * benefit) / hours;
-
-            // 3. แสดงผล FTE
             document.getElementById('totalStaff').innerText = totalFTE.toFixed(2);
 
-            // 4. คำนวณจำนวนคน (Headcount) ตามสูตรในรูปภาพ
-            // สูตร: (FTE * 2368) / 2080
             let headCount = (totalFTE * 2368) / 2080;
             
-            // แสดงผลจำนวนคน
             document.getElementById('headCountResult').innerText = headCount.toFixed(2);
-            // อัปเดตข้อความแสดงวิธีทำตัวเล็กๆ
             document.getElementById('formulaDetail').innerText = 
                 `( ${totalFTE.toFixed(2)} x 2,368 ) / 2,080`;
 
-
-            // 5. คำนวณการจัดเวร (Daily Staffing)
-            // ใช้ logic เดิม: FTE / Benefit = Daily working staff
             let dailyStaff = totalFTE / benefit; 
             
             document.getElementById('shiftMorning').innerText = Math.round(dailyStaff * 0.6);
@@ -198,7 +243,6 @@
             document.getElementById('shiftNight').innerText = Math.round(dailyStaff * 0.15);
         }
 
-        // รันครั้งแรกเมื่อเปิดหน้าเว็บ
         calculate();
     </script>
 
