@@ -83,7 +83,7 @@
                     </div>
                 </div>
 
-                <!-- ⭐ NEW: FTE Formula Display ⭐ -->
+                <!-- FTE Formula Display -->
                 <div class="bg-white p-3 rounded border border-blue-100 shadow-sm text-center">
                     <p class="text-[10px] text-gray-400 uppercase font-bold mb-1 tracking-wider">สูตรการคำนวณ FTE</p>
                     <div class="text-sm text-gray-700 font-medium overflow-x-auto whitespace-nowrap">
@@ -92,7 +92,6 @@
                         ÷ <span class="text-gray-900">ชม.ทำงาน</span>
                     </div>
                 </div>
-
             </div>
 
             <hr class="border-gray-100">
@@ -150,9 +149,42 @@
                 <p class="text-xs text-blue-400 mt-2 text-center">*หมายเหตุ: คำนวณจากจำนวนคนที่ขึ้นปฏิบัติงานจริงต่อวัน (Daily Working Staff)</p>
             </div>
 
-            <hr class="border-dashed border-gray-300">
+            <!-- ⭐ NEW SECTION: Parameter Definitions & Formulas ⭐ -->
+            <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+                <h3 class="text-gray-700 font-bold text-base mb-4 border-b pb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    🧮 สูตรและที่มาของตัวแปร (Definitions & Formulas)
+                </h3>
+                <div class="space-y-3">
+                    <!-- ADC -->
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">ADC (จำนวนผู้ป่วยเฉลี่ย)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= จำนวนวันนอนของผู้ป่วยทั้งหมดใน 1 ปี ÷ 365 วัน</div>
+                    </div>
+                    <!-- NHPPD -->
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">NHPPD (ชั่วโมงการพยาบาล)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= จำนวนชั่วโมงความต้องการ การพยาบาลของผู้ป่วยรวมกันทุกคน ÷ จำนวนผู้ป่วยเฉลี่ยต่อวัน(ADC)</div>
+                    </div>
+                    <!-- Constant -->
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Constant (ค่าคงที่)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= 1.4 (มาตรฐานกองการพยาบาล เผื่อเวลางานเอกสารและกิจกรรมทางอ้อม)</div>
+                    </div>
+                    <!-- Benefit FTE -->
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Benefit FTE (ค่าชดเชย)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= (วันทำการ + วันลา + วันหยุดนักขัตฤกษ์) ÷ วันทำการ (ปกติค่าเฉลี่ยอยู่ที่ 1.14 - 1.17)</div>
+                    </div>
+                    <!-- Work Hours -->
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">ชม.ทำงาน/วัน</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= เวลาขึ้นเวร (8 ชม.) - เวลาพัก (1 ชม.) = 7 ชม.</div>
+                    </div>
+                </div>
+            </div>
 
-            <!-- ⭐ Reference Table (Warstler, 1970) ⭐ -->
+            <!-- Reference Table (Warstler, 1970) -->
             <div class="bg-orange-50 border border-orange-100 rounded-lg p-5">
                 <h3 class="text-orange-800 font-bold text-lg mb-3 flex items-center">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
