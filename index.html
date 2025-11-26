@@ -47,7 +47,7 @@
                     <p class="text-[10px] text-gray-400 mt-1 pl-1">เลือกเพื่อดึงค่า NHPPD มาตรฐาน</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">จำนวนผู้ป่วยเฉลี่ย (ADC)</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ขั้นตอนที่1 หาจำนวนผู้ป่วยเฉลี่ย (ADC)</label>
                     <!-- Added calcNHPPDTable() to oninput to recalculate NHPPD when ADC changes -->
                     <input type="number" id="adc" value="0" oninput="calcNHPPDTable(); calculate();" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     <p class="text-[10px] text-gray-400 mt-1 pl-1">Average Daily Census (คน/วัน)</p>
@@ -57,7 +57,7 @@
             <!-- NEW SECTION: Detailed NHPPD Calculation -->
             <div class="bg-orange-50 p-5 rounded-lg border border-orange-200">
                 <h3 class="text-sm font-bold text-orange-800 mb-4 uppercase tracking-wider border-b pb-2 border-orange-200 flex justify-between items-center">
-                    <span>คำนวณค่า NHPPD (ตามประเภทผู้ป่วย)</span>
+                    <span>ขั้นตอนที่2 คำนวณค่า NHPPD (ตามประเภทผู้ป่วย)</span>
                     <button onclick="resetNHPPDTable()" class="text-xs text-orange-400 hover:text-orange-600 font-normal underline">รีค่าเริ่มต้น</button>
                 </h3>
                 
@@ -144,7 +144,7 @@
             <!-- Section 2: Parameters -->
             <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 transition-colors duration-300" id="paramSection">
                 <h3 class="text-sm font-bold text-gray-600 mb-4 uppercase tracking-wider border-b pb-2 border-gray-200">
-                    ตัวแปรการคำนวณ (Parameters)
+                    ขั้นตอนที่3 หา FTE โดยใส่ตัวแปรการคำนวณ (Parameters)
                 </h3>
                 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-6 mb-6">
@@ -189,7 +189,7 @@
 
             <!-- Section 3: FTE Result -->
             <div class="text-center">
-                <p class="text-gray-500 mb-1 text-sm">อัตรากำลัง FTE ที่ต้องการ (100%)</p>
+                <p class="text-gray-500 mb-1 text-sm">ขั้นตอนที่4 หาอัตรากำลัง FTE ที่ต้องการ (100%)</p>
                 <h2 class="text-5xl font-bold text-gray-700" id="totalStaff">0.00</h2>
                 <p class="text-gray-400 text-xs mt-1 uppercase tracking-widest">Full Time Equivalent</p>
             </div>
@@ -219,7 +219,7 @@
 
                 <div class="flex flex-col items-center justify-center mb-4">
                     <div class="text-xl md:text-2xl font-serif italic flex items-center flex-wrap justify-center">
-                        <span class="mr-3">จำนวนคน = </span>
+                        <span class="mr-3">(ขั้นตอนที่5)หาจำนวนคน = </span>
                         <div class="fraction">
                             <span class="numerator px-2">FTE × 2,368</span>
                             <span class="denominator">2,080</span>
@@ -242,7 +242,7 @@
             <!-- Section 4: Shift Plan (Customizable) -->
             <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
                 <div class="flex justify-between items-end mb-3">
-                    <h3 class="text-blue-800 font-semibold">แนะนำการจัดเวร (Daily Shift Plan)</h3>
+                    <h3 class="text-blue-800 font-semibold">ขั้นตอนที่6 แนะนำการจัดเวร (Daily Shift Plan)</h3>
                     <div class="text-[10px] text-blue-500 bg-white px-2 py-1 rounded border border-blue-100">
                         รวม: <span id="totalShiftPct" class="font-bold">100</span>%
                     </div>
