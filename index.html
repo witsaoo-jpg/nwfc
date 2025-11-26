@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nursing Workforce Calculation System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Import html2pdf library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
         /* CSS Class สำหรับสร้างเส้นเศษส่วน */
@@ -13,6 +15,9 @@
         .fraction > span { display: block; padding-top: 0.1em; }
         .fraction span.numerator { border-bottom: 2px solid white; }
         .fraction span.denominator { border-top: 2px solid transparent; }
+        
+        /* Specific styles for PDF Report to ensure black/white text looks good */
+        .report-fraction span.numerator { border-bottom: 1px solid black; }
         
         /* ซ่อนปุ่ม Spin ของ Input number */
         input[type=number]::-webkit-inner-spin-button, 
@@ -29,10 +34,58 @@
         <!-- Header -->
         <div class="bg-blue-600 p-6 text-white">
             <h1 class="text-2xl font-bold">🏥 คำนวณอัตรากำลังพยาบาล</h1>
-            <p class="text-blue-100 text-sm">Nursing Workforce Calculation System (Auto-Sync)</p>
+            <p class="text-blue-100 text-sm">Nursing Workforce Calculation System (Database Mode)</p>
         </div>
 
         <div class="p-6 space-y-6">
+
+            <!-- Unit Management (CRUD) -->
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-300 shadow-sm relative">
+                <div class="absolute top-0 right-0 -mt-2 -mr-2 w-4 h-4 bg-red-500 rounded-full animate-ping hidden" id="saveIndicator"></div>
+                <h3 class="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider border-b border-gray-200 pb-2">
+                    จัดการข้อมูลหน่วยงาน (Unit Management)
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+                    <!-- Unit Code (Key) -->
+                    <div class="md:col-span-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">รหัสหน่วยงาน (Code)</label>
+                        <div class="flex shadow-sm">
+                            <input type="text" id="unitCode" placeholder="เช่น W01" onchange="autoLoad()" class="w-full p-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500 text-blue-800 font-bold">
+                            <button onclick="loadUnit()" class="bg-blue-500 text-white px-3 rounded-r-md hover:bg-blue-600 transition" title="ค้นหา/โหลดข้อมูล">
+                                🔍
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-gray-400 mt-1 pl-1">*ใช้รหัสนี้เพื่อเรียกดูข้อมูลเก่า</p>
+                    </div>
+                    <!-- Unit Name -->
+                    <div class="md:col-span-8">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อหน่วยงาน (Unit Name)</label>
+                        <input type="text" id="unitName" placeholder="ระบุชื่อหอผู้ป่วย..." class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap gap-2 pt-2 border-t border-gray-200">
+                    <button onclick="saveUnit()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow flex items-center transition text-sm font-semibold">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                        บันทึก (Save)
+                    </button>
+                    <button onclick="deleteUnit()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow flex items-center transition text-sm">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        ลบ (Delete)
+                    </button>
+                    <button onclick="clearForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded shadow flex items-center transition text-sm">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        ล้างค่า (New)
+                    </button>
+                    <div class="flex-grow"></div>
+                    <!-- PDF Button -->
+                    <button onclick="generatePDF()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded shadow flex items-center transition text-sm font-semibold">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        พิมพ์รายงาน PDF
+                    </button>
+                </div>
+            </div>
             
             <!-- Section 1: Inputs -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -48,13 +101,12 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">ขั้นตอนที่1 จำนวนผู้ป่วยเฉลี่ย (ADC)</label>
-                    <!-- Added calcNHPPDTable() to oninput to recalculate NHPPD when ADC changes -->
                     <input type="number" id="adc" value="0" oninput="calcNHPPDTable(); calculate();" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     <p class="text-[10px] text-gray-400 mt-1 pl-1">Average Daily Census (คน/วัน)</p>
                 </div>
             </div>
 
-            <!-- NEW SECTION: Detailed NHPPD Calculation -->
+            <!-- Detailed NHPPD Calculation -->
             <div class="bg-orange-50 p-5 rounded-lg border border-orange-200">
                 <h3 class="text-sm font-bold text-orange-800 mb-4 uppercase tracking-wider border-b pb-2 border-orange-200 flex justify-between items-center">
                     <span>ขั้นตอนที่2 คำนวณค่า NHPPD (ตามประเภทผู้ป่วย)</span>
@@ -125,7 +177,6 @@
                         <div>
                             <p class="text-[10px] text-gray-400 uppercase tracking-wide">Average NHPPD</p>
                             <p class="text-3xl font-bold text-orange-600" id="calc_nhppd_result">0.00</p>
-                            <!-- ⭐ Formula Detail Updated: Uses ADC as divisor ⭐ -->
                             <p class="text-[10px] text-gray-400 mt-1 font-mono" id="nhppd_formula_text">
                                 ( Workload ÷ ADC )
                             </p>
@@ -239,7 +290,7 @@
                 </div>
             </div>
 
-            <!-- Section 4: Shift Plan (Customizable) -->
+            <!-- Section 4: Shift Plan -->
             <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
                 <div class="flex justify-between items-end mb-3">
                     <h3 class="text-blue-800 font-semibold">ขั้นตอนที่6 แนะนำการจัดเวร (Daily Shift Plan)</h3>
@@ -249,27 +300,21 @@
                 </div>
 
                 <div class="grid grid-cols-3 gap-3 text-center">
-                    <!-- Morning (Default 40%) -->
                     <div class="bg-white p-3 rounded shadow-sm border border-blue-100 hover:shadow-md transition">
                         <label class="text-xs text-gray-500 block mb-1">เวรเช้า (%)</label>
-                        <input type="number" id="pctMorning" value="40" oninput="calculate()" 
-                            class="w-full text-center border-b-2 border-blue-200 focus:border-blue-500 outline-none font-bold text-gray-700 mb-2">
+                        <input type="number" id="pctMorning" value="40" oninput="calculate()" class="w-full text-center border-b-2 border-blue-200 focus:border-blue-500 outline-none font-bold text-gray-700 mb-2">
                         <p class="text-2xl font-bold text-blue-600" id="shiftMorning">0</p>
                         <p class="text-[10px] text-gray-400">คน</p>
                     </div>
-                    <!-- Afternoon (Default 30%) -->
                     <div class="bg-white p-3 rounded shadow-sm border border-blue-100 hover:shadow-md transition">
                         <label class="text-xs text-gray-500 block mb-1">เวรบ่าย (%)</label>
-                        <input type="number" id="pctAfternoon" value="30" oninput="calculate()" 
-                            class="w-full text-center border-b-2 border-orange-200 focus:border-orange-500 outline-none font-bold text-gray-700 mb-2">
+                        <input type="number" id="pctAfternoon" value="30" oninput="calculate()" class="w-full text-center border-b-2 border-orange-200 focus:border-orange-500 outline-none font-bold text-gray-700 mb-2">
                         <p class="text-2xl font-bold text-orange-500" id="shiftAfternoon">0</p>
                         <p class="text-[10px] text-gray-400">คน</p>
                     </div>
-                    <!-- Night (Default 30%) -->
                     <div class="bg-white p-3 rounded shadow-sm border border-blue-100 hover:shadow-md transition">
                         <label class="text-xs text-gray-500 block mb-1">เวรดึก (%)</label>
-                        <input type="number" id="pctNight" value="30" oninput="calculate()" 
-                            class="w-full text-center border-b-2 border-indigo-200 focus:border-indigo-500 outline-none font-bold text-gray-700 mb-2">
+                        <input type="number" id="pctNight" value="30" oninput="calculate()" class="w-full text-center border-b-2 border-indigo-200 focus:border-indigo-500 outline-none font-bold text-gray-700 mb-2">
                         <p class="text-2xl font-bold text-indigo-600" id="shiftNight">0</p>
                         <p class="text-[10px] text-gray-400">คน</p>
                     </div>
@@ -277,7 +322,7 @@
                 <p class="text-xs text-blue-400 mt-3 text-center">*หมายเหตุ: คำนวณจากจำนวนคนขึ้นปฏิบัติงานจริง (Daily Staff) โดยอิงตาม % ที่กำหนด</p>
             </div>
 
-            <!-- ⭐ NEW SECTION: Definitions & Formulas (Updated) ⭐ -->
+            <!-- Definitions & Formulas (Reverted to Detailed Version) -->
             <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
                 <h3 class="text-gray-700 font-bold text-base mb-4 border-b pb-2 flex items-center">
                     <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
@@ -310,7 +355,7 @@
                         <div class="sm:w-2/3 text-gray-600 pt-1">= เวลาขึ้นเวร (8 ชม.) - เวลาพัก (1 ชม.) = 7 ชม.</div>
                     </div>
                      
-                    <!-- ⭐ NEW DETAILED DEFINITIONS ADDED HERE ⭐ -->
+                    <!-- FTE -->
                     <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm mt-2 border-t pt-2 border-gray-100">
                         <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">FTE (Full-Time Equivalent)</div>
                         <div class="sm:w-2/3 text-gray-600 pt-1">
@@ -319,17 +364,18 @@
                         </div>
                     </div>
 
+                    <!-- Non-Productive -->
                     <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
                         <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Non-Productive Hours (ชม.ไม่ได้งาน)</div>
                         <div class="sm:w-2/3 text-gray-600 pt-1">= วันลาต่างๆ ตามสิทธิ์รวมประมาณ 36 วัน x 8 ชม. = 288 ชม.</div>
                     </div>
 
+                    <!-- Productive -->
                     <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
                         <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Productive Hours (ชม.ที่ได้งาน)</div>
                         <div class="sm:w-2/3 text-gray-600 pt-1">= ชม.ทำงานทั้งปี - ชม.ที่ไม่ได้งาน (2,080 - 288 = 1,792 ชม.)</div>
                     </div>
-                    <!-- END OF NEW DEFINITIONS -->
-
+                    
                     <!-- Staffing Rationale -->
                     <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm bg-yellow-50 p-2 rounded border border-yellow-200 mt-2">
                         <div class="sm:w-1/3 font-semibold text-yellow-800 bg-yellow-100 px-2 py-1 rounded self-start">Staffing % (70%)</div>
@@ -371,9 +417,7 @@
     <!-- Footer -->
     <div class="text-center mt-8 mb-8 text-gray-500 space-y-4">
         <div class="text-sm font-medium opacity-75">
-            ผู้ตรวจสอบโปรแกรม : อาจารย์อิชยา สุวรรณกุล
-            <br>
-            พัฒนาโดย พว.วิษณุกรณ์ โอยา(รพ.ชลบุรี)
+            ผู้ตรวจสอบโปรแกรม : อาจารย์อิชยา สุวรรณกุล <br> พัฒนาโดย พว.วิษณุกรณ์ โอยา(รพ.ชลบุรี)
         </div>
         <div class="flex justify-center items-center opacity-90">
              <a href="https://www.freecounterstat.com" title="free hit counters">
@@ -382,73 +426,163 @@
         </div>
     </div>
 
+    <!-- Hidden Report Template -->
+    <div id="reportContent" class="hidden bg-white p-8 max-w-[210mm] mx-auto text-black">
+        <div class="text-center mb-6 border-b-2 border-black pb-4">
+            <h1 class="text-2xl font-bold mb-2">รายงานการคำนวณอัตรากำลังพยาบาล</h1>
+            <h2 class="text-lg">(Nursing Workforce Calculation Report)</h2>
+            <p class="text-sm mt-2 text-gray-600">วันที่พิมพ์: <span id="rptDate"></span></p>
+        </div>
+
+        <div class="flex justify-between mb-6 text-sm">
+            <div>
+                <p><strong>หน่วยงาน:</strong> <span id="rptUnitName">-</span></p>
+                <p><strong>รหัสหน่วยงาน:</strong> <span id="rptUnitCode">-</span></p>
+            </div>
+            <div class="text-right">
+                <p><strong>ประเภทหอผู้ป่วย:</strong> <span id="rptWardType">-</span></p>
+            </div>
+        </div>
+
+        <!-- Part 1: Parameters -->
+        <div class="mb-6">
+            <h3 class="font-bold border-b border-gray-400 mb-2">1. ข้อมูลพื้นฐานและตัวแปร (Parameters)</h3>
+            <div class="grid grid-cols-4 gap-4 text-sm bg-gray-50 p-3 rounded border border-gray-200">
+                <div>
+                    <span class="block text-gray-500 text-xs">จำนวนผู้ป่วยเฉลี่ย (ADC)</span>
+                    <span class="font-bold text-lg" id="rptADC">0</span>
+                </div>
+                <div>
+                    <span class="block text-gray-500 text-xs">NHPPD เฉลี่ย</span>
+                    <span class="font-bold text-lg" id="rptNHPPD">0</span>
+                </div>
+                <div>
+                    <span class="block text-gray-500 text-xs">ค่าคงที่ (Constant)</span>
+                    <span class="font-bold text-lg" id="rptConstant">1.4</span>
+                </div>
+                <div>
+                    <span class="block text-gray-500 text-xs">Productivity</span>
+                    <span class="font-bold text-lg" id="rptProd">70%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Part 2: Workload Breakdown -->
+        <div class="mb-6">
+            <h3 class="font-bold border-b border-gray-400 mb-2">2. รายละเอียดภาระงาน (Workload Breakdown)</h3>
+            <table class="w-full text-sm border-collapse border border-gray-300">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="border border-gray-300 p-2 text-left">ประเภทผู้ป่วย</th>
+                        <th class="border border-gray-300 p-2 text-center">จำนวน (คน)</th>
+                        <th class="border border-gray-300 p-2 text-center">ชม./คน</th>
+                        <th class="border border-gray-300 p-2 text-right">รวม (ชม.)</th>
+                    </tr>
+                </thead>
+                <tbody id="rptTableBody">
+                    <!-- JS will populate -->
+                </tbody>
+                <tfoot class="bg-gray-50 font-bold">
+                    <tr>
+                        <td class="border border-gray-300 p-2 text-right">รวมทั้งหมด</td>
+                        <td class="border border-gray-300 p-2 text-center" id="rptTotalPt">0</td>
+                        <td class="border border-gray-300 p-2"></td>
+                        <td class="border border-gray-300 p-2 text-right" id="rptTotalHr">0</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Part 3: Results -->
+        <div class="mb-6">
+            <h3 class="font-bold border-b border-gray-400 mb-2">3. ผลลัพธ์การคำนวณ (Results)</h3>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="border border-gray-300 p-4 rounded text-center">
+                    <p class="text-gray-500 text-sm mb-1">อัตรากำลัง FTE (100%)</p>
+                    <p class="text-3xl font-bold" id="rptFTE">0.00</p>
+                    <p class="text-xs text-gray-400">Full Time Equivalent</p>
+                </div>
+                <div class="border border-gray-300 p-4 rounded text-center bg-gray-50">
+                    <p class="text-gray-500 text-sm mb-1">จำนวนคน (Headcount) ที่ <span id="rptPctDisplay">70%</span></p>
+                    <p class="text-4xl font-bold text-black" id="rptHeadcount">0.00</p>
+                    <p class="text-xs text-gray-500 mt-1">คน</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Part 4: Shift Plan -->
+        <div class="mb-8">
+            <h3 class="font-bold border-b border-gray-400 mb-2">4. แผนจัดเวรประจำวัน (Daily Shift Plan)</h3>
+            <div class="flex border border-gray-300 rounded overflow-hidden">
+                <div class="flex-1 p-3 text-center border-r border-gray-300">
+                    <p class="text-xs text-gray-500">เวรเช้า (<span id="rptPctM">40</span>%)</p>
+                    <p class="text-xl font-bold" id="rptShiftM">0</p>
+                </div>
+                <div class="flex-1 p-3 text-center border-r border-gray-300">
+                    <p class="text-xs text-gray-500">เวรบ่าย (<span id="rptPctA">30</span>%)</p>
+                    <p class="text-xl font-bold" id="rptShiftA">0</p>
+                </div>
+                <div class="flex-1 p-3 text-center">
+                    <p class="text-xs text-gray-500">เวรดึก (<span id="rptPctN">30</span>%)</p>
+                    <p class="text-xl font-bold" id="rptShiftN">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signature Area -->
+        <div class="grid grid-cols-2 gap-10 mt-12 pt-8">
+            <div class="text-center">
+                <div class="border-b border-black w-3/4 mx-auto mb-2"></div>
+                <p class="text-sm">ผู้จัดทำ/คำนวณ</p>
+                <p class="text-xs text-gray-500 mt-1">วันที่: _____/_____/_____</p>
+            </div>
+            <div class="text-center">
+                <div class="border-b border-black w-3/4 mx-auto mb-2"></div>
+                <p class="text-sm">หัวหน้าหอผู้ป่วย/ผู้ตรวจสอบ</p>
+                <p class="text-xs text-gray-500 mt-1">วันที่: _____/_____/_____</p>
+            </div>
+        </div>
+    </div>
+
     <script>
         function updatePreset() {
             const type = document.getElementById('wardType').value;
             const nhppdInput = document.getElementById('nhppd');
-            
             if (type === 'ward_gen') nhppdInput.value = 3.5;
             else if (type === 'icu') nhppdInput.value = 12.0;
             else if (type === 'opd') nhppdInput.value = 0.5;
-            
             calculate(); 
         }
 
-        // --- NHPPD Calculation Logic (Auto-Sync) ---
         function calcNHPPDTable() {
             let totalPatients = 0;
             let totalHours = 0;
-
             for (let i = 1; i <= 5; i++) {
                 let pt = parseFloat(document.getElementById(`pt_${i}`).value) || 0;
                 let hr = parseFloat(document.getElementById(`hr_${i}`).value) || 0;
                 let sum = pt * hr;
-                
                 document.getElementById(`sum_hr_${i}`).innerText = sum.toFixed(1);
-                
                 totalPatients += pt;
                 totalHours += sum;
             }
-
-            // Get ADC value
             let adc = parseFloat(document.getElementById('adc').value) || 0;
-
             document.getElementById('grand_total_pt').innerText = totalPatients;
             document.getElementById('grand_total_hr').innerText = totalHours.toFixed(1);
-
-            // CORRECTION: Divide Total Hours by ADC (instead of Total Patients in table)
             let avgNHPPD = adc > 0 ? (totalHours / adc) : 0;
             let finalAvg = avgNHPPD.toFixed(2);
-            
-            // Update Table display
             document.getElementById('calc_nhppd_result').innerText = finalAvg;
+            document.getElementById('nhppd_formula_text').innerText = `( ${totalHours.toFixed(1)} ชม. ÷ ADC ${adc} )`;
 
-            // Update formula detail text
-            document.getElementById('nhppd_formula_text').innerText = 
-                `( ${totalHours.toFixed(1)} ชม. ÷ ADC ${adc} )`;
-
-            // --- AUTO SYNC LOGIC ---
-            // Only sync if there is some workload (totalHours > 0) OR if the user is actively using the table (totalPatients > 0)
             if(totalPatients > 0 || totalHours > 0) {
-                // 1. Update Parameter Input
                 const nhppdInput = document.getElementById('nhppd');
                 nhppdInput.value = finalAvg;
-                
-                // 2. Change Ward Type to Custom (Visual feedback)
                 document.getElementById('wardType').value = 'custom';
-                
-                // 3. Highlight Effect (Flash Orange)
                 const highlight = document.getElementById('nhppd_highlight');
                 highlight.classList.remove('opacity-0');
                 setTimeout(() => highlight.classList.add('opacity-0'), 600);
-                
-                // 4. Show Sync Badge
                 document.getElementById('sync_badge').classList.remove('hidden');
-
-                // 5. Trigger Main Calculation
                 calculate();
             } else {
-                // Hide Sync Badge if no data
                 document.getElementById('sync_badge').classList.add('hidden');
             }
         }
@@ -461,20 +595,17 @@
         }
 
         function calculate() {
-            // 1. รับค่าตัวแปร
             let adc = parseFloat(document.getElementById('adc').value) || 0;
             let nhppd = parseFloat(document.getElementById('nhppd').value) || 0;
             let constant = parseFloat(document.getElementById('constant').value) || 0;
             let benefit = parseFloat(document.getElementById('benefit').value) || 0;
             let hours = parseFloat(document.getElementById('workHours').value) || 1;
-            let staffPct = parseFloat(document.getElementById('staffPercentage').value) || 1; // % productivity
+            let staffPct = parseFloat(document.getElementById('staffPercentage').value) || 1; 
 
-            // 2. รับค่า % เวร
             let pM = parseFloat(document.getElementById('pctMorning').value) || 0;
             let pA = parseFloat(document.getElementById('pctAfternoon').value) || 0;
             let pN = parseFloat(document.getElementById('pctNight').value) || 0;
             
-            // แสดงยอดรวม % เวร (เตือนถ้าไม่ครบ 100)
             let totalPctShift = pM + pA + pN;
             let totalPctEl = document.getElementById('totalShiftPct');
             totalPctEl.innerText = totalPctShift;
@@ -486,28 +617,19 @@
                 totalPctEl.parentElement.classList.add('text-blue-500');
             }
 
-            // 3. คำนวณ FTE เต็ม (100%)
             let totalFTE = (adc * nhppd * constant * benefit) / hours;
             document.getElementById('totalStaff').innerText = totalFTE.toFixed(2);
 
-            // 4. คำนวณ Headcount ตาม % ที่เลือก (Default 70%)
             let fullHeadCount = (totalFTE * 2368) / 2080;
             let adjustedHeadCount = fullHeadCount * staffPct;
             
             document.getElementById('headCountResult').innerText = adjustedHeadCount.toFixed(2);
             document.getElementById('displayPct').innerText = Math.round(staffPct * 100);
             
-            // แสดงสูตร Headcount แบบ dynamic
             document.getElementById('formulaDetail').innerText = 
                 `( (${fullHeadCount.toFixed(2)} คน) x ${Math.round(staffPct * 100)}% )`;
 
-            // 5. คำนวณเวร (Daily Working Staff)
-            // Daily Staff คิดจาก FTE (เพราะ FTE คือภาระงานต่อวันที่มี Benefit แล้ว)
-            // หรือคิดจาก Headcount ก็ได้ แต่นิยมคิดจาก FTE พื้นฐานแล้วหาร Benefit เพื่อหาคนทำงานจริงต่อวัน
             let dailyStaff = totalFTE / benefit; 
-            
-            // ปรับ Daily Staff ตาม Productivity ด้วยไหม? 
-            // ปกติถ้าลดคน (Headcount 70%) คนขึ้นเวรจริงก็จะลดลงตามสัดส่วน
             let adjustedDailyStaff = dailyStaff * staffPct;
 
             document.getElementById('shiftMorning').innerText = Math.round(adjustedDailyStaff * (pM / 100));
@@ -515,9 +637,193 @@
             document.getElementById('shiftNight').innerText = Math.round(adjustedDailyStaff * (pN / 100));
         }
 
-        // เริ่มต้นคำนวณทันที
+        function saveUnit() {
+            const unitCode = document.getElementById('unitCode').value.trim();
+            if (!unitCode) {
+                alert('กรุณาระบุรหัสหน่วยงาน (Unit Code) ก่อนบันทึก');
+                return;
+            }
+            const data = {
+                unitCode: unitCode,
+                unitName: document.getElementById('unitName').value,
+                wardType: document.getElementById('wardType').value,
+                adc: document.getElementById('adc').value,
+                nhppdTable: {
+                    pt_1: document.getElementById('pt_1').value, hr_1: document.getElementById('hr_1').value,
+                    pt_2: document.getElementById('pt_2').value, hr_2: document.getElementById('hr_2').value,
+                    pt_3: document.getElementById('pt_3').value, hr_3: document.getElementById('hr_3').value,
+                    pt_4: document.getElementById('pt_4').value, hr_4: document.getElementById('hr_4').value,
+                    pt_5: document.getElementById('pt_5').value, hr_5: document.getElementById('hr_5').value
+                },
+                nhppd: document.getElementById('nhppd').value,
+                constant: document.getElementById('constant').value,
+                benefit: document.getElementById('benefit').value,
+                workHours: document.getElementById('workHours').value,
+                staffPercentage: document.getElementById('staffPercentage').value,
+                shiftPlan: {
+                    morning: document.getElementById('pctMorning').value,
+                    afternoon: document.getElementById('pctAfternoon').value,
+                    night: document.getElementById('pctNight').value
+                }
+            };
+            localStorage.setItem('nursing_app_' + unitCode, JSON.stringify(data));
+            const btn = document.activeElement;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✅ บันทึกแล้ว';
+            setTimeout(() => { btn.innerHTML = originalText; }, 1500);
+        }
+
+        function loadUnit() {
+            const unitCode = document.getElementById('unitCode').value.trim();
+            if (!unitCode) {
+                alert('กรุณาระบุรหัสหน่วยงานเพื่อค้นหา');
+                return;
+            }
+            const storedData = localStorage.getItem('nursing_app_' + unitCode);
+            if (storedData) {
+                const data = JSON.parse(storedData);
+                document.getElementById('unitName').value = data.unitName || '';
+                document.getElementById('wardType').value = data.wardType || 'custom';
+                document.getElementById('adc').value = data.adc || 0;
+                
+                if (data.nhppdTable) {
+                    document.getElementById('pt_1').value = data.nhppdTable.pt_1 || 0;
+                    document.getElementById('pt_2').value = data.nhppdTable.pt_2 || 0;
+                    document.getElementById('pt_3').value = data.nhppdTable.pt_3 || 0;
+                    document.getElementById('pt_4').value = data.nhppdTable.pt_4 || 0;
+                    document.getElementById('pt_5').value = data.nhppdTable.pt_5 || 0;
+                }
+                document.getElementById('nhppd').value = data.nhppd || 0;
+                document.getElementById('constant').value = data.constant || 1.4;
+                document.getElementById('benefit').value = data.benefit || 1.14;
+                document.getElementById('workHours').value = data.workHours || 7;
+                document.getElementById('staffPercentage').value = data.staffPercentage || 0.7;
+                if (data.shiftPlan) {
+                    document.getElementById('pctMorning').value = data.shiftPlan.morning || 40;
+                    document.getElementById('pctAfternoon').value = data.shiftPlan.afternoon || 30;
+                    document.getElementById('pctNight').value = data.shiftPlan.night || 30;
+                }
+                calcNHPPDTable();
+                calculate();
+                alert('โหลดข้อมูลเรียบร้อย: ' + unitCode);
+            } else {
+                alert('ไม่พบข้อมูลสำหรับรหัส: ' + unitCode);
+            }
+        }
+
+        function deleteUnit() {
+            const unitCode = document.getElementById('unitCode').value.trim();
+            if (!unitCode) {
+                alert('กรุณาระบุรหัสหน่วยงานที่จะลบ');
+                return;
+            }
+            if (confirm('คุณต้องการลบข้อมูลของรหัส ' + unitCode + ' ใช่หรือไม่?')) {
+                localStorage.removeItem('nursing_app_' + unitCode);
+                clearForm();
+                alert('ลบข้อมูลเรียบร้อย');
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('unitCode').value = '';
+            document.getElementById('unitName').value = '';
+            document.getElementById('wardType').value = 'custom';
+            document.getElementById('adc').value = 0;
+            resetNHPPDTable();
+            document.getElementById('nhppd').value = 0;
+            document.getElementById('constant').value = 1.4;
+            document.getElementById('benefit').value = 1.14;
+            document.getElementById('workHours').value = 7;
+            document.getElementById('staffPercentage').value = 0.7;
+            document.getElementById('pctMorning').value = 40;
+            document.getElementById('pctAfternoon').value = 30;
+            document.getElementById('pctNight').value = 30;
+            calculate();
+        }
+
+        function autoLoad() {}
+
+        document.getElementById('unitCode').addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                loadUnit();
+            }
+        });
+
+        // --- PDF Generation Logic ---
+        function generatePDF() {
+            // 1. Populate Report Data
+            document.getElementById('rptDate').innerText = new Date().toLocaleDateString('th-TH');
+            document.getElementById('rptUnitName').innerText = document.getElementById('unitName').value || '-';
+            document.getElementById('rptUnitCode').innerText = document.getElementById('unitCode').value || '-';
+            const wtMap = {
+                'custom': 'กำหนดเอง',
+                'ward_gen': 'หอผู้ป่วยสามัญ (General)',
+                'icu': 'หอผู้ป่วยวิกฤต (ICU)',
+                'opd': 'ผู้ป่วยนอก (OPD)'
+            };
+            document.getElementById('rptWardType').innerText = wtMap[document.getElementById('wardType').value] || '-';
+            
+            document.getElementById('rptADC').innerText = document.getElementById('adc').value;
+            document.getElementById('rptNHPPD').innerText = document.getElementById('nhppd').value;
+            document.getElementById('rptConstant').innerText = document.getElementById('constant').value;
+            const pctVal = parseFloat(document.getElementById('staffPercentage').value) * 100;
+            document.getElementById('rptProd').innerText = Math.round(pctVal) + '%';
+            document.getElementById('rptPctDisplay').innerText = Math.round(pctVal) + '%';
+
+            // Populate Table
+            const tbody = document.getElementById('rptTableBody');
+            tbody.innerHTML = '';
+            const types = [
+                '5. Intensive Care', '4. Modified Intensive', '3. Intermediate Care', 
+                '2. Minimal Care', '1. Self Care'
+            ];
+            // Iterate backwards 5 to 1 to match UI
+            for(let i=5; i>=1; i--) {
+                const pt = document.getElementById(`pt_${i}`).value;
+                const hr = document.getElementById(`hr_${i}`).value;
+                const sum = document.getElementById(`sum_hr_${i}`).innerText;
+                const row = `<tr>
+                    <td class="border border-gray-300 p-2">${types[5-i]}</td>
+                    <td class="border border-gray-300 p-2 text-center">${pt}</td>
+                    <td class="border border-gray-300 p-2 text-center">${hr}</td>
+                    <td class="border border-gray-300 p-2 text-right">${sum}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            }
+            document.getElementById('rptTotalPt').innerText = document.getElementById('grand_total_pt').innerText;
+            document.getElementById('rptTotalHr').innerText = document.getElementById('grand_total_hr').innerText;
+
+            document.getElementById('rptFTE').innerText = document.getElementById('totalStaff').innerText;
+            document.getElementById('rptHeadcount').innerText = document.getElementById('headCountResult').innerText;
+
+            document.getElementById('rptPctM').innerText = document.getElementById('pctMorning').value;
+            document.getElementById('rptShiftM').innerText = document.getElementById('shiftMorning').innerText;
+            document.getElementById('rptPctA').innerText = document.getElementById('pctAfternoon').value;
+            document.getElementById('rptShiftA').innerText = document.getElementById('shiftAfternoon').innerText;
+            document.getElementById('rptPctN').innerText = document.getElementById('pctNight').value;
+            document.getElementById('rptShiftN').innerText = document.getElementById('shiftNight').innerText;
+
+            // 2. Generate PDF
+            const element = document.getElementById('reportContent');
+            element.classList.remove('hidden'); // Show for rendering
+
+            const opt = {
+                margin:       10,
+                filename:     `Nursing_Report_${document.getElementById('unitCode').value || 'Draft'}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.classList.add('hidden'); // Hide after saving
+            });
+        }
+
+        // Initialize
         calculate();
-        calcNHPPDTable(); // Init table calc
+        calcNHPPDTable();
     </script>
 
 </body>
