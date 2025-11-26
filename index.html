@@ -47,7 +47,7 @@
                     <p class="text-[10px] text-gray-400 mt-1 pl-1">เลือกเพื่อดึงค่า NHPPD มาตรฐาน</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">ขั้นตอนที่1 หาจำนวนผู้ป่วยเฉลี่ย (ADC)</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ขั้นตอนที่1 จำนวนผู้ป่วยเฉลี่ย (ADC)</label>
                     <!-- Added calcNHPPDTable() to oninput to recalculate NHPPD when ADC changes -->
                     <input type="number" id="adc" value="0" oninput="calcNHPPDTable(); calculate();" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     <p class="text-[10px] text-gray-400 mt-1 pl-1">Average Daily Census (คน/วัน)</p>
@@ -144,7 +144,7 @@
             <!-- Section 2: Parameters -->
             <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 transition-colors duration-300" id="paramSection">
                 <h3 class="text-sm font-bold text-gray-600 mb-4 uppercase tracking-wider border-b pb-2 border-gray-200">
-                    ขั้นตอนที่3 หา FTE โดยใส่ตัวแปรการคำนวณ (Parameters)
+                    ขั้นตอนที่3 หา FTE โดยใส่ค่าตัวแปรการคำนวณ (Parameters)
                 </h3>
                 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-6 mb-6">
@@ -176,7 +176,7 @@
 
                 <!-- FTE Formula Display -->
                 <div class="bg-white p-3 rounded border border-blue-100 shadow-sm text-center">
-                    <p class="text-[10px] text-gray-400 uppercase font-bold mb-1 tracking-wider">สูตรการคำนวณ FTE(1FTE=2,368ชั่วโมง)</p>
+                    <p class="text-[10px] text-gray-400 uppercase font-bold mb-1 tracking-wider">สูตรการคำนวณ FTE (1 FTE = 2,368 ชม.)</p>
                     <div class="text-sm text-gray-700 font-medium overflow-x-auto whitespace-nowrap">
                         <span class="text-blue-600 font-bold">FTE</span> = 
                         ( <span class="text-gray-900">ADC</span> × <span class="text-gray-900">NHPPD</span> × <span class="text-gray-900">Constant</span> × <span class="text-gray-900">Benefit</span> ) 
@@ -189,7 +189,7 @@
 
             <!-- Section 3: FTE Result -->
             <div class="text-center">
-                <p class="text-gray-500 mb-1 text-sm">ขั้นตอนที่4 หาอัตรากำลัง FTE ที่ต้องการ (100%)</p>
+                <p class="text-gray-500 mb-1 text-sm">ขั้นตอนที่4 อัตรากำลัง FTE ที่ต้องการ (100%)</p>
                 <h2 class="text-5xl font-bold text-gray-700" id="totalStaff">0.00</h2>
                 <p class="text-gray-400 text-xs mt-1 uppercase tracking-widest">Full Time Equivalent</p>
             </div>
@@ -277,7 +277,7 @@
                 <p class="text-xs text-blue-400 mt-3 text-center">*หมายเหตุ: คำนวณจากจำนวนคนขึ้นปฏิบัติงานจริง (Daily Staff) โดยอิงตาม % ที่กำหนด</p>
             </div>
 
-            <!-- ⭐ NEW SECTION: Definitions & Formulas (Added from Image) ⭐ -->
+            <!-- ⭐ NEW SECTION: Definitions & Formulas (Updated) ⭐ -->
             <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
                 <h3 class="text-gray-700 font-bold text-base mb-4 border-b pb-2 flex items-center">
                     <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
@@ -309,8 +309,29 @@
                         <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">ชม.ทำงาน/วัน</div>
                         <div class="sm:w-2/3 text-gray-600 pt-1">= เวลาขึ้นเวร (8 ชม.) - เวลาพัก (1 ชม.) = 7 ชม.</div>
                     </div>
-                    <!-- NEW: 70% Staffing Rationale -->
-                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm bg-yellow-50 p-2 rounded border border-yellow-200">
+                     
+                    <!-- ⭐ NEW DETAILED DEFINITIONS ADDED HERE ⭐ -->
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm mt-2 border-t pt-2 border-gray-100">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">FTE (Full-Time Equivalent)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">
+                            = ค่าเทียบเท่าพนักงานเต็มเวลา (8 ชม. x 5 วัน x 52 สัปดาห์ = 2,080 ชม.) + วันลาตามสิทธิ์ (288 ชม.) <br>
+                            <span class="font-bold text-gray-800">ดังนั้น 1 FTE = 2,368 ชม.</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Non-Productive Hours (ชม.ไม่ได้งาน)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= วันลาต่างๆ ตามสิทธิ์รวมประมาณ 36 วัน x 8 ชม. = 288 ชม.</div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Productive Hours (ชม.ที่ได้งาน)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= ชม.ทำงานทั้งปี - ชม.ที่ไม่ได้งาน (2,080 - 288 = 1,792 ชม.)</div>
+                    </div>
+                    <!-- END OF NEW DEFINITIONS -->
+
+                    <!-- Staffing Rationale -->
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm bg-yellow-50 p-2 rounded border border-yellow-200 mt-2">
                         <div class="sm:w-1/3 font-semibold text-yellow-800 bg-yellow-100 px-2 py-1 rounded self-start">Staffing % (70%)</div>
                         <div class="sm:w-2/3 text-gray-700 pt-1">
                             = <span class="font-bold">เกณฑ์ขั้นต่ำ (Minimum Requirement)</span> ที่ต้องมีเพื่อให้หอผู้ป่วยเปิดดำเนินการได้โดยปลอดภัย (Patient Safety) 
