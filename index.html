@@ -24,12 +24,12 @@
 </head>
 <body class="p-4 md:p-6">
 
-    <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+    <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         
         <!-- Header -->
         <div class="bg-blue-600 p-6 text-white">
             <h1 class="text-2xl font-bold">🏥 คำนวณอัตรากำลังพยาบาล</h1>
-            <p class="text-blue-100 text-sm">Nursing Workforce Calculation System (Adjustable)</p>
+            <p class="text-blue-100 text-sm">Nursing Workforce Calculation System (Auto-Sync)</p>
         </div>
 
         <div class="p-6 space-y-6">
@@ -53,17 +53,99 @@
                 </div>
             </div>
 
+            <!-- NEW SECTION: Detailed NHPPD Calculation -->
+            <div class="bg-orange-50 p-5 rounded-lg border border-orange-200">
+                <h3 class="text-sm font-bold text-orange-800 mb-4 uppercase tracking-wider border-b pb-2 border-orange-200 flex justify-between items-center">
+                    <span>คำนวณค่า NHPPD (ตามประเภทผู้ป่วย)</span>
+                    <button onclick="resetNHPPDTable()" class="text-xs text-orange-400 hover:text-orange-600 font-normal underline">รีค่าเริ่มต้น</button>
+                </h3>
+                
+                <div class="overflow-x-auto mb-4">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-orange-100 text-orange-900 border-b border-orange-200">
+                                <th class="py-2 px-2 text-left font-semibold">ประเภท (Type)</th>
+                                <th class="py-2 px-2 text-center w-20 font-semibold">จำนวนคน</th>
+                                <th class="py-2 px-2 text-center w-20 font-semibold">ชม./คน</th>
+                                <th class="py-2 px-2 text-right w-24 font-semibold">รวม (ชม.)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-orange-100">
+                            <!-- Type 5 -->
+                            <tr>
+                                <td class="py-2 px-2 text-gray-700">5. Intensive Care</td>
+                                <td class="px-1"><input type="number" id="pt_5" value="0" min="0" oninput="calcNHPPDTable()" class="w-full p-1 border border-orange-200 rounded text-center focus:ring-1 focus:ring-orange-500"></td>
+                                <td class="px-1"><input type="number" id="hr_5" value="12.0" step="0.1" oninput="calcNHPPDTable()" class="w-full p-1 border border-orange-200 rounded text-center bg-white text-gray-500 focus:text-black"></td>
+                                <td class="py-2 px-2 text-right font-mono text-orange-600" id="sum_hr_5">0.0</td>
+                            </tr>
+                            <!-- Type 4 -->
+                            <tr>
+                                <td class="py-2 px-2 text-gray-700">4. Modified Intensive</td>
+                                <td class="px-1"><input type="number" id="pt_4" value="0" min="0" oninput="calcNHPPDTable()" class="w-full p-1 border border-orange-200 rounded text-center focus:ring-1 focus:ring-orange-500"></td>
+                                <td class="px-1"><input type="number" id="hr_4" value="7.5" step="0.1" oninput="calcNHPPDTable()" class="w-full p-1 border border-orange-200 rounded text-center bg-white text-gray-500 focus:text-black"></td>
+                                <td class="py-2 px-2 text-right font-mono text-orange-600" id="sum_hr_4">0.0</td>
+                            </tr>
+                            <!-- Type 3 -->
+                            <tr>
+                                <td class="py-2 px-2 text-gray-700">3. Intermediate Care</td>
+                                <td class="px-1"><input type="number" id="pt_3" value="0" min="0" oninput="calcNHPPDTable()" class="w-full p-1 border border-orange-200 rounded text-center focus:ring-1 focus:ring-orange-500"></td>
+                                <td class="px-1"><input type="number" id="hr_3" value="5.5" step="0.1" oninput="calcNHPPDTable()" class="w-full p-1 border border-orange-200 rounded text-center bg-white text-gray-500 focus:text-black"></td>
+                                <td class="py-2 px-2 text-right font-mono text-orange-600" id="sum_hr_3">0.0</td>
+                            </tr>
+                            <!-- Type 2 -->
+                            <tr>
+                                <td class="py-2 px-2 text-gray-700">2. Minimal Care</td>
+                                <td class="px-1"><input type="number" id="pt_2" value="0" min="0" oninput="calcNHPPDTable()" class="w-full p-1 border border-orange-200 rounded text-center focus:ring-1 focus:ring-orange-500"></td>
+                                <td class="px-1"><input type="number" id="hr_2" value="3.5" step="0.1" oninput="calcNHPPDTable()" class="w-full p-1 border border-orange-200 rounded text-center bg-white text-gray-500 focus:text-black"></td>
+                                <td class="py-2 px-2 text-right font-mono text-orange-600" id="sum_hr_2">0.0</td>
+                            </tr>
+                            <!-- Type 1 -->
+                            <tr>
+                                <td class="py-2 px-2 text-gray-700">1. Self Care</td>
+                                <td class="px-1"><input type="number" id="pt_1" value="0" min="0" oninput="calcNHPPDTable()" class="w-full p-1 border border-orange-200 rounded text-center focus:ring-1 focus:ring-orange-500"></td>
+                                <td class="px-1"><input type="number" id="hr_1" value="1.5" step="0.1" oninput="calcNHPPDTable()" class="w-full p-1 border border-orange-200 rounded text-center bg-white text-gray-500 focus:text-black"></td>
+                                <td class="py-2 px-2 text-right font-mono text-orange-600" id="sum_hr_1">0.0</td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="bg-orange-100 font-bold text-orange-900">
+                            <tr>
+                                <td class="py-2 px-2 text-right">รวม (Total)</td>
+                                <td class="py-2 px-2 text-center" id="grand_total_pt">0</td>
+                                <td class="py-2 px-2 text-center">-</td>
+                                <td class="py-2 px-2 text-right" id="grand_total_hr">0.0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Result Box (Auto-sending) -->
+                <div class="flex items-center justify-between bg-white p-3 rounded border border-orange-200 shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div>
+                            <p class="text-[10px] text-gray-400 uppercase tracking-wide">Average NHPPD</p>
+                            <p class="text-3xl font-bold text-orange-600" id="calc_nhppd_result">0.00</p>
+                        </div>
+                        <div class="hidden md:block h-8 w-px bg-gray-200"></div>
+                        <div class="text-xs text-green-600 flex items-center bg-green-50 px-2 py-1 rounded-full hidden" id="sync_badge">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            ส่งค่าไปที่ Parameters แล้ว
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Section 2: Parameters -->
-            <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+            <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 transition-colors duration-300" id="paramSection">
                 <h3 class="text-sm font-bold text-gray-600 mb-4 uppercase tracking-wider border-b pb-2 border-gray-200">
                     ตัวแปรการคำนวณ (Parameters)
                 </h3>
                 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-6 mb-6">
                     <!-- NHPPD -->
-                    <div>
+                    <div class="relative">
                         <label class="block text-xs font-semibold text-gray-700 mb-1">NHPPD (ชม.)</label>
-                        <input type="number" step="0.1" id="nhppd" value="3.5" oninput="calculate()" class="w-full p-1.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500">
+                        <input type="number" step="0.1" id="nhppd" value="3.5" oninput="calculate()" class="w-full p-1.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500 transition-all duration-300">
+                        <div id="nhppd_highlight" class="absolute inset-0 border-2 border-orange-400 rounded opacity-0 pointer-events-none transition-opacity duration-500"></div>
                     </div>
 
                     <!-- Constant -->
@@ -160,26 +242,26 @@
                 </div>
 
                 <div class="grid grid-cols-3 gap-3 text-center">
-                    <!-- Morning -->
+                    <!-- Morning (Default 40%) -->
                     <div class="bg-white p-3 rounded shadow-sm border border-blue-100 hover:shadow-md transition">
                         <label class="text-xs text-gray-500 block mb-1">เวรเช้า (%)</label>
-                        <input type="number" id="pctMorning" value="60" oninput="calculate()" 
+                        <input type="number" id="pctMorning" value="40" oninput="calculate()" 
                             class="w-full text-center border-b-2 border-blue-200 focus:border-blue-500 outline-none font-bold text-gray-700 mb-2">
                         <p class="text-2xl font-bold text-blue-600" id="shiftMorning">0</p>
                         <p class="text-[10px] text-gray-400">คน</p>
                     </div>
-                    <!-- Afternoon -->
+                    <!-- Afternoon (Default 30%) -->
                     <div class="bg-white p-3 rounded shadow-sm border border-blue-100 hover:shadow-md transition">
                         <label class="text-xs text-gray-500 block mb-1">เวรบ่าย (%)</label>
-                        <input type="number" id="pctAfternoon" value="25" oninput="calculate()" 
+                        <input type="number" id="pctAfternoon" value="30" oninput="calculate()" 
                             class="w-full text-center border-b-2 border-orange-200 focus:border-orange-500 outline-none font-bold text-gray-700 mb-2">
                         <p class="text-2xl font-bold text-orange-500" id="shiftAfternoon">0</p>
                         <p class="text-[10px] text-gray-400">คน</p>
                     </div>
-                    <!-- Night -->
+                    <!-- Night (Default 30%) -->
                     <div class="bg-white p-3 rounded shadow-sm border border-blue-100 hover:shadow-md transition">
                         <label class="text-xs text-gray-500 block mb-1">เวรดึก (%)</label>
-                        <input type="number" id="pctNight" value="15" oninput="calculate()" 
+                        <input type="number" id="pctNight" value="30" oninput="calculate()" 
                             class="w-full text-center border-b-2 border-indigo-200 focus:border-indigo-500 outline-none font-bold text-gray-700 mb-2">
                         <p class="text-2xl font-bold text-indigo-600" id="shiftNight">0</p>
                         <p class="text-[10px] text-gray-400">คน</p>
@@ -188,25 +270,60 @@
                 <p class="text-xs text-blue-400 mt-3 text-center">*หมายเหตุ: คำนวณจากจำนวนคนขึ้นปฏิบัติงานจริง (Daily Staff) โดยอิงตาม % ที่กำหนด</p>
             </div>
 
+            <!-- ⭐ NEW SECTION: Definitions & Formulas (Added from Image) ⭐ -->
+            <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+                <h3 class="text-gray-700 font-bold text-base mb-4 border-b pb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    สูตรและที่มาของตัวแปร (Definitions & Formulas)
+                </h3>
+                <div class="space-y-3">
+                    <!-- ADC -->
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">ADC (จำนวนผู้ป่วยเฉลี่ย)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= จำนวนวันนอนของผู้ป่วยทั้งหมดใน 1 ปี ÷ 365 วัน</div>
+                    </div>
+                    <!-- NHPPD -->
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">NHPPD (ชั่วโมงการพยาบาล)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= จำนวนชั่วโมงความต้องการ การพยาบาลของผู้ป่วยรวมกันทุกคน ÷ จำนวนผู้ป่วยเฉลี่ยต่อวัน(ADC)</div>
+                    </div>
+                    <!-- Constant -->
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Constant (ค่าคงที่)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= 1.4 (7วัน/5วัน=1.4 คือ อัตรากำลังทดแทนในวันหยุด)</div>
+                    </div>
+                    <!-- Benefit FTE -->
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Benefit FTE (ค่าชดเชย)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= (จำนวนชม.ของจนท.1คนต่อปี + non P.H.วันลาวันหยุดนักขัตฤกษ์) ÷ จำนวนชม.ของจนท.1คนต่อปี คือ (2080+288)/2080=1.14(ปกติค่าเฉลี่ยอยู่ที่ 1.14 - 1.17)</div>
+                    </div>
+                    <!-- Work Hours -->
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">ชม.ทำงาน/วัน</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= เวลาขึ้นเวร (8 ชม.) - เวลาพัก (1 ชม.) = 7 ชม.</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Reference Table -->
             <div class="bg-orange-50 border border-orange-100 rounded-lg p-5">
                 <h3 class="text-orange-800 font-bold text-sm mb-3">
-                     เกณฑ์ NHPPD (Warstler, 1970)
+                     เกณฑ์ NHPPD ตามการจำแนกประเภทผู้ป่วย (อ้างอิง: Warstler, 1970)
                 </h3>
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white rounded-md overflow-hidden shadow-sm text-xs md:text-sm">
                         <thead class="bg-orange-100 text-orange-900">
                             <tr>
-                                <th class="py-2 px-3 text-left">Classification</th>
-                                <th class="py-2 px-3 text-center">NHPPD</th>
+                                <th class="py-2 px-3 text-left">ประเภทผู้ป่วย (Classification)</th>
+                                <th class="py-2 px-3 text-center">NHPPD (ชม.)</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            <tr><td class="py-2 px-3">5. Intensive Care</td><td class="py-2 px-3 text-center font-bold">12.0</td></tr>
-                            <tr><td class="py-2 px-3">4. Modified Intensive Care</td><td class="py-2 px-3 text-center font-bold">7.5</td></tr>
-                            <tr><td class="py-2 px-3">3. Intermediate Care</td><td class="py-2 px-3 text-center font-bold">5.5</td></tr>
-                            <tr><td class="py-2 px-3">2. Minimal Care</td><td class="py-2 px-3 text-center font-bold">3.5</td></tr>
-                            <tr><td class="py-2 px-3">1. Self Care</td><td class="py-2 px-3 text-center font-bold">1.5</td></tr>
+                            <tr><td class="py-2 px-3">5. Intensive Care</td><td class="py-2 px-3 text-center text-blue-600 font-bold">12.0</td></tr>
+                            <tr><td class="py-2 px-3">4. Modified Intensive Care</td><td class="py-2 px-3 text-center text-blue-600 font-bold">7.5</td></tr>
+                            <tr><td class="py-2 px-3">3. Intermediate Care</td><td class="py-2 px-3 text-center text-blue-600 font-bold">5.5</td></tr>
+                            <tr><td class="py-2 px-3">2. Minimal Care</td><td class="py-2 px-3 text-center text-blue-600 font-bold">3.5</td></tr>
+                            <tr><td class="py-2 px-3">1. Self Care</td><td class="py-2 px-3 text-center text-blue-600 font-bold">1.5</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -239,6 +356,63 @@
             else if (type === 'opd') nhppdInput.value = 0.5;
             
             calculate(); 
+        }
+
+        // --- NHPPD Calculation Logic (Auto-Sync) ---
+        function calcNHPPDTable() {
+            let totalPatients = 0;
+            let totalHours = 0;
+
+            for (let i = 1; i <= 5; i++) {
+                let pt = parseFloat(document.getElementById(`pt_${i}`).value) || 0;
+                let hr = parseFloat(document.getElementById(`hr_${i}`).value) || 0;
+                let sum = pt * hr;
+                
+                document.getElementById(`sum_hr_${i}`).innerText = sum.toFixed(1);
+                
+                totalPatients += pt;
+                totalHours += sum;
+            }
+
+            document.getElementById('grand_total_pt').innerText = totalPatients;
+            document.getElementById('grand_total_hr').innerText = totalHours.toFixed(1);
+
+            let avgNHPPD = totalPatients > 0 ? (totalHours / totalPatients) : 0;
+            let finalAvg = avgNHPPD.toFixed(2);
+            
+            // Update Table display
+            document.getElementById('calc_nhppd_result').innerText = finalAvg;
+
+            // --- AUTO SYNC LOGIC ---
+            if(totalPatients > 0) {
+                // 1. Update Parameter Input
+                const nhppdInput = document.getElementById('nhppd');
+                nhppdInput.value = finalAvg;
+                
+                // 2. Change Ward Type to Custom (Visual feedback)
+                document.getElementById('wardType').value = 'custom';
+                
+                // 3. Highlight Effect (Flash Orange)
+                const highlight = document.getElementById('nhppd_highlight');
+                highlight.classList.remove('opacity-0');
+                setTimeout(() => highlight.classList.add('opacity-0'), 600);
+                
+                // 4. Show Sync Badge
+                document.getElementById('sync_badge').classList.remove('hidden');
+
+                // 5. Trigger Main Calculation
+                calculate();
+            } else {
+                // Hide Sync Badge if no data
+                document.getElementById('sync_badge').classList.add('hidden');
+            }
+        }
+
+        function resetNHPPDTable() {
+            for(let i=1; i<=5; i++) {
+                document.getElementById(`pt_${i}`).value = 0;
+            }
+            calcNHPPDTable();
         }
 
         function calculate() {
@@ -298,6 +472,7 @@
 
         // เริ่มต้นคำนวณทันที
         calculate();
+        calcNHPPDTable(); // Init table calc
     </script>
 
 </body>
