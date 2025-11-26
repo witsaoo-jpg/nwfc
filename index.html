@@ -48,7 +48,8 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">จำนวนผู้ป่วยเฉลี่ย (ADC)</label>
-                    <input type="number" id="adc" value="30" oninput="calculate()" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <!-- Added calcNHPPDTable() to oninput to recalculate NHPPD when ADC changes -->
+                    <input type="number" id="adc" value="0" oninput="calcNHPPDTable(); calculate();" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                     <p class="text-[10px] text-gray-400 mt-1 pl-1">Average Daily Census (คน/วัน)</p>
                 </div>
             </div>
@@ -120,15 +121,21 @@
 
                 <!-- Result Box (Auto-sending) -->
                 <div class="flex items-center justify-between bg-white p-3 rounded border border-orange-200 shadow-sm">
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 w-full">
                         <div>
                             <p class="text-[10px] text-gray-400 uppercase tracking-wide">Average NHPPD</p>
                             <p class="text-3xl font-bold text-orange-600" id="calc_nhppd_result">0.00</p>
+                            <!-- ⭐ Formula Detail Updated: Uses ADC as divisor ⭐ -->
+                            <p class="text-[10px] text-gray-400 mt-1 font-mono" id="nhppd_formula_text">
+                                ( Workload ÷ ADC )
+                            </p>
                         </div>
-                        <div class="hidden md:block h-8 w-px bg-gray-200"></div>
-                        <div class="text-xs text-green-600 flex items-center bg-green-50 px-2 py-1 rounded-full hidden" id="sync_badge">
-                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            ส่งค่าไปที่ Parameters แล้ว
+                        <div class="hidden md:block h-12 w-px bg-gray-200 mx-2"></div>
+                        
+                        <!-- Success Badge -->
+                        <div class="text-xs text-green-600 flex items-center bg-green-50 px-3 py-1.5 rounded-full hidden" id="sync_badge">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span>ส่งค่าไปที่ Parameters แล้ว</span>
                         </div>
                     </div>
                 </div>
@@ -382,17 +389,26 @@
                 totalHours += sum;
             }
 
+            // Get ADC value
+            let adc = parseFloat(document.getElementById('adc').value) || 0;
+
             document.getElementById('grand_total_pt').innerText = totalPatients;
             document.getElementById('grand_total_hr').innerText = totalHours.toFixed(1);
 
-            let avgNHPPD = totalPatients > 0 ? (totalHours / totalPatients) : 0;
+            // CORRECTION: Divide Total Hours by ADC (instead of Total Patients in table)
+            let avgNHPPD = adc > 0 ? (totalHours / adc) : 0;
             let finalAvg = avgNHPPD.toFixed(2);
             
             // Update Table display
             document.getElementById('calc_nhppd_result').innerText = finalAvg;
 
+            // Update formula detail text
+            document.getElementById('nhppd_formula_text').innerText = 
+                `( ${totalHours.toFixed(1)} ชม. ÷ ADC ${adc} )`;
+
             // --- AUTO SYNC LOGIC ---
-            if(totalPatients > 0) {
+            // Only sync if there is some workload (totalHours > 0) OR if the user is actively using the table (totalPatients > 0)
+            if(totalPatients > 0 || totalHours > 0) {
                 // 1. Update Parameter Input
                 const nhppdInput = document.getElementById('nhppd');
                 nhppdInput.value = finalAvg;
