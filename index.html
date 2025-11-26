@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nursing Staff Calculator</title>
+    <title>Nursing Staff Calculator V2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -13,16 +13,23 @@
         .fraction > span { display: block; padding-top: 0.1em; }
         .fraction span.numerator { border-bottom: 2px solid white; }
         .fraction span.denominator { border-top: 2px solid transparent; }
+        
+        /* ซ่อนปุ่ม Spin ของ Input number */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
     </style>
 </head>
-<body class="p-6">
+<body class="p-4 md:p-6">
 
     <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         
         <!-- Header -->
         <div class="bg-blue-600 p-6 text-white">
             <h1 class="text-2xl font-bold">🏥 คำนวณอัตรากำลังพยาบาล</h1>
-            <p class="text-blue-100 text-sm">Nursing Workforce Calculation System</p>
+            <p class="text-blue-100 text-sm">Nursing Workforce Calculation System (Adjustable)</p>
         </div>
 
         <div class="p-6 space-y-6">
@@ -46,40 +53,35 @@
                 </div>
             </div>
 
-            <!-- Section 2: Parameters with Formula -->
+            <!-- Section 2: Parameters -->
             <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
                 <h3 class="text-sm font-bold text-gray-600 mb-4 uppercase tracking-wider border-b pb-2 border-gray-200">
                     ตัวแปรการคำนวณ (Parameters)
                 </h3>
                 
-                <!-- Input Grid -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-6 mb-6">
                     <!-- NHPPD -->
                     <div>
                         <label class="block text-xs font-semibold text-gray-700 mb-1">NHPPD (ชม.)</label>
                         <input type="number" step="0.1" id="nhppd" value="3.5" oninput="calculate()" class="w-full p-1.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500">
-                        <p class="text-[10px] text-blue-500 mt-1 leading-tight">*ชม.การพยาบาลที่ผู้ป่วยต้องการต่อวัน</p>
                     </div>
 
                     <!-- Constant -->
                     <div>
                         <label class="block text-xs font-semibold text-gray-700 mb-1">ค่าคงที่ (Constant)</label>
                         <input type="number" step="0.1" id="constant" value="1.4" oninput="calculate()" class="w-full p-1.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500">
-                        <p class="text-[10px] text-blue-500 mt-1 leading-tight">*ค่าเผื่อเวลาสำหรับงานทางอ้อม</p>
                     </div>
 
                     <!-- Benefit FTE -->
                     <div>
                         <label class="block text-xs font-semibold text-gray-700 mb-1">Benefit FTE</label>
                         <input type="number" step="0.01" id="benefit" value="1.14" oninput="calculate()" class="w-full p-1.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500">
-                        <p class="text-[10px] text-blue-500 mt-1 leading-tight">*ค่าชดเชยวันหยุด/วันลา</p>
                     </div>
 
                     <!-- Work Hours -->
                     <div>
                         <label class="block text-xs font-semibold text-gray-700 mb-1">ชม.ทำงาน/วัน</label>
                         <input type="number" id="workHours" value="7" oninput="calculate()" class="w-full p-1.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500">
-                        <p class="text-[10px] text-blue-500 mt-1 leading-tight">*เวลาทำงานจริงหักพัก</p>
                     </div>
                 </div>
 
@@ -98,7 +100,7 @@
 
             <!-- Section 3: FTE Result -->
             <div class="text-center">
-                <p class="text-gray-500 mb-1 text-sm">อัตรากำลัง FTE ที่ต้องการ</p>
+                <p class="text-gray-500 mb-1 text-sm">อัตรากำลัง FTE ที่ต้องการ (100%)</p>
                 <h2 class="text-5xl font-bold text-gray-700" id="totalStaff">0.00</h2>
                 <p class="text-gray-400 text-xs mt-1 uppercase tracking-widest">Full Time Equivalent</p>
             </div>
@@ -106,121 +108,105 @@
             <!-- Section: Headcount Formula (Dark Box) -->
             <div class="bg-gray-800 text-white rounded-xl p-6 shadow-inner relative overflow-hidden">
                 <div class="absolute top-0 right-0 -mt-2 -mr-2 w-24 h-24 bg-white opacity-5 rounded-full blur-xl"></div>
+                
                 <h3 class="text-center text-yellow-400 text-sm font-semibold mb-4 uppercase tracking-widest">
                     คำนวณจำนวนคน (Headcount)
                 </h3>
+
+                <!-- Controls for Percentage -->
+                <div class="flex justify-center mb-6">
+                    <div class="bg-gray-700 p-2 rounded-lg border border-gray-600 flex items-center space-x-2">
+                        <label class="text-xs text-gray-300">เลือกสัดส่วน (Productivity):</label>
+                        <select id="staffPercentage" onchange="calculate()" class="bg-gray-900 text-white text-sm border border-gray-500 rounded px-2 py-1 focus:ring-1 focus:ring-yellow-400 outline-none">
+                            <option value="1">100% (เต็มกรอบ)</option>
+                            <option value="0.9">90%</option>
+                            <option value="0.8">80%</option>
+                            <option value="0.75">75%</option>
+                            <option value="0.7" selected>70% (ขั้นต่ำ)</option>
+                            <option value="0.6">60%</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="flex flex-col items-center justify-center mb-4">
-                    <div class="text-xl md:text-2xl font-serif italic flex items-center">
+                    <div class="text-xl md:text-2xl font-serif italic flex items-center flex-wrap justify-center">
                         <span class="mr-3">จำนวนคน = </span>
                         <div class="fraction">
                             <span class="numerator px-2">FTE × 2,368</span>
                             <span class="denominator">2,080</span>
                         </div>
+                        <span class="ml-2 text-yellow-300 text-lg"> × <span id="displayPct">70</span>%</span>
                     </div>
                 </div>
+
                 <div class="text-center mt-2">
-                    <div class="inline-block bg-gray-700 px-6 py-2 rounded-lg border border-gray-600">
-                        <span class="text-4xl font-bold text-green-400" id="headCountResult">0.00</span>
+                    <div class="inline-block bg-gray-900 px-6 py-3 rounded-lg border border-green-500 shadow-lg shadow-green-900/20">
+                        <span class="text-5xl font-bold text-green-400" id="headCountResult">0.00</span>
                         <span class="text-lg text-gray-300 ml-2">คน</span>
                     </div>
                     <p class="text-xs text-gray-400 mt-3" id="formulaDetail">
-                        ( 0.00 x 2,368 ) / 2,080
+                        (คำนวณจาก FTE x สัดส่วนที่เลือก)
                     </p>
                 </div>
             </div>
 
-            <!-- Section 4: Shift Plan -->
-            <div class="bg-blue-50 p-4 rounded-lg">
-                <h3 class="text-blue-800 font-semibold mb-2">แนะนำการจัดเวร (Daily Shift Plan)</h3>
-                <div class="grid grid-cols-3 gap-2 text-center">
-                    <div class="bg-white p-2 rounded shadow-sm">
-                        <p class="text-xs text-gray-500">เวรเช้า (60%)</p>
-                        <p class="text-xl font-bold text-blue-600" id="shiftMorning">0</p>
-                    </div>
-                    <div class="bg-white p-2 rounded shadow-sm">
-                        <p class="text-xs text-gray-500">เวรบ่าย (25%)</p>
-                        <p class="text-xl font-bold text-blue-600" id="shiftAfternoon">0</p>
-                    </div>
-                    <div class="bg-white p-2 rounded shadow-sm">
-                        <p class="text-xs text-gray-500">เวรดึก (15%)</p>
-                        <p class="text-xl font-bold text-blue-600" id="shiftNight">0</p>
+            <!-- Section 4: Shift Plan (Customizable) -->
+            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                <div class="flex justify-between items-end mb-3">
+                    <h3 class="text-blue-800 font-semibold">แนะนำการจัดเวร (Daily Shift Plan)</h3>
+                    <div class="text-[10px] text-blue-500 bg-white px-2 py-1 rounded border border-blue-100">
+                        รวม: <span id="totalShiftPct" class="font-bold">100</span>%
                     </div>
                 </div>
-                <p class="text-xs text-blue-400 mt-2 text-center">*หมายเหตุ: คำนวณจากจำนวนคนที่ขึ้นปฏิบัติงานจริงต่อวัน (Daily Working Staff)</p>
-            </div>
 
-            <!-- ⭐ NEW SECTION: Parameter Definitions & Formulas ⭐ -->
-            <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
-                <h3 class="text-gray-700 font-bold text-base mb-4 border-b pb-2 flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                    🧮 สูตรและที่มาของตัวแปร (Definitions & Formulas)
-                </h3>
-                <div class="space-y-3">
-                    <!-- ADC -->
-                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
-                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">ADC (จำนวนผู้ป่วยเฉลี่ย)</div>
-                        <div class="sm:w-2/3 text-gray-600 pt-1">= จำนวนวันนอนของผู้ป่วยทั้งหมดใน 1 ปี ÷ 365 วัน</div>
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <!-- Morning -->
+                    <div class="bg-white p-3 rounded shadow-sm border border-blue-100 hover:shadow-md transition">
+                        <label class="text-xs text-gray-500 block mb-1">เวรเช้า (%)</label>
+                        <input type="number" id="pctMorning" value="60" oninput="calculate()" 
+                            class="w-full text-center border-b-2 border-blue-200 focus:border-blue-500 outline-none font-bold text-gray-700 mb-2">
+                        <p class="text-2xl font-bold text-blue-600" id="shiftMorning">0</p>
+                        <p class="text-[10px] text-gray-400">คน</p>
                     </div>
-                    <!-- NHPPD -->
-                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
-                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">NHPPD (ชั่วโมงการพยาบาล)</div>
-                        <div class="sm:w-2/3 text-gray-600 pt-1">= จำนวนชั่วโมงความต้องการ การพยาบาลของผู้ป่วยรวมกันทุกคน ÷ จำนวนผู้ป่วยเฉลี่ยต่อวัน(ADC)</div>
+                    <!-- Afternoon -->
+                    <div class="bg-white p-3 rounded shadow-sm border border-blue-100 hover:shadow-md transition">
+                        <label class="text-xs text-gray-500 block mb-1">เวรบ่าย (%)</label>
+                        <input type="number" id="pctAfternoon" value="25" oninput="calculate()" 
+                            class="w-full text-center border-b-2 border-orange-200 focus:border-orange-500 outline-none font-bold text-gray-700 mb-2">
+                        <p class="text-2xl font-bold text-orange-500" id="shiftAfternoon">0</p>
+                        <p class="text-[10px] text-gray-400">คน</p>
                     </div>
-                    <!-- Constant -->
-                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
-                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Constant (ค่าคงที่)</div>
-                        <div class="sm:w-2/3 text-gray-600 pt-1">= 1.4 (7วัน/5วัน=1.4 คือ อัตรากำลังทดแทนในวันหยุด)</div>
-                    </div>
-                    <!-- Benefit FTE -->
-                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
-                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Benefit FTE (ค่าชดเชย)</div>
-                        <div class="sm:w-2/3 text-gray-600 pt-1">= (จำนวนชม.ของจนท.1คนต่อปี + non P.H.วันลาวันหยุดนักขัตฤกษ์) ÷ จำนวนชม.ของจนท.1คนต่อปี คือ (2080+288)/2080=1.14(ปกติค่าเฉลี่ยอยู่ที่ 1.14 - 1.17)</div>
-                    </div>
-                    <!-- Work Hours -->
-                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
-                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">ชม.ทำงาน/วัน</div>
-                        <div class="sm:w-2/3 text-gray-600 pt-1">= เวลาขึ้นเวร (8 ชม.) - เวลาพัก (1 ชม.) = 7 ชม.</div>
+                    <!-- Night -->
+                    <div class="bg-white p-3 rounded shadow-sm border border-blue-100 hover:shadow-md transition">
+                        <label class="text-xs text-gray-500 block mb-1">เวรดึก (%)</label>
+                        <input type="number" id="pctNight" value="15" oninput="calculate()" 
+                            class="w-full text-center border-b-2 border-indigo-200 focus:border-indigo-500 outline-none font-bold text-gray-700 mb-2">
+                        <p class="text-2xl font-bold text-indigo-600" id="shiftNight">0</p>
+                        <p class="text-[10px] text-gray-400">คน</p>
                     </div>
                 </div>
+                <p class="text-xs text-blue-400 mt-3 text-center">*หมายเหตุ: คำนวณจากจำนวนคนขึ้นปฏิบัติงานจริง (Daily Staff) โดยอิงตาม % ที่กำหนด</p>
             </div>
 
-            <!-- Reference Table (Warstler, 1970) -->
+            <!-- Reference Table -->
             <div class="bg-orange-50 border border-orange-100 rounded-lg p-5">
-                <h3 class="text-orange-800 font-bold text-lg mb-3 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                    เกณฑ์ NHPPD ตามการจำแนกประเภทผู้ป่วย
+                <h3 class="text-orange-800 font-bold text-sm mb-3">
+                     เกณฑ์ NHPPD (Warstler, 1970)
                 </h3>
-                <p class="text-xs text-orange-600 mb-3 font-medium">(อ้างอิง: Warstler, 1970)</p>
-                
                 <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white rounded-md overflow-hidden shadow-sm text-sm">
+                    <table class="min-w-full bg-white rounded-md overflow-hidden shadow-sm text-xs md:text-sm">
                         <thead class="bg-orange-100 text-orange-900">
                             <tr>
-                                <th class="py-2 px-4 text-left font-semibold">ประเภทผู้ป่วย (Classification)</th>
-                                <th class="py-2 px-4 text-center font-semibold">NHPPD (ชม.)</th>
+                                <th class="py-2 px-3 text-left">Classification</th>
+                                <th class="py-2 px-3 text-center">NHPPD</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            <tr class="hover:bg-orange-50">
-                                <td class="py-2 px-4 text-gray-700 font-medium">5. Intensive Care</td>
-                                <td class="py-2 px-4 text-center text-blue-600 font-bold">12.0</td>
-                            </tr>
-                            <tr class="hover:bg-orange-50">
-                                <td class="py-2 px-4 text-gray-700">4. Modified Intensive Care</td>
-                                <td class="py-2 px-4 text-center text-blue-600 font-bold">7.5</td>
-                            </tr>
-                            <tr class="hover:bg-orange-50">
-                                <td class="py-2 px-4 text-gray-700">3. Intermediate Care</td>
-                                <td class="py-2 px-4 text-center text-blue-600 font-bold">5.5</td>
-                            </tr>
-                            <tr class="hover:bg-orange-50">
-                                <td class="py-2 px-4 text-gray-700">2. Minimal Care</td>
-                                <td class="py-2 px-4 text-center text-blue-600 font-bold">3.5</td>
-                            </tr>
-                            <tr class="hover:bg-orange-50">
-                                <td class="py-2 px-4 text-gray-700">1. Self Care</td>
-                                <td class="py-2 px-4 text-center text-blue-600 font-bold">1.5</td>
-                            </tr>
+                            <tr><td class="py-2 px-3">5. Intensive Care</td><td class="py-2 px-3 text-center font-bold">12.0</td></tr>
+                            <tr><td class="py-2 px-3">4. Modified Intensive Care</td><td class="py-2 px-3 text-center font-bold">7.5</td></tr>
+                            <tr><td class="py-2 px-3">3. Intermediate Care</td><td class="py-2 px-3 text-center font-bold">5.5</td></tr>
+                            <tr><td class="py-2 px-3">2. Minimal Care</td><td class="py-2 px-3 text-center font-bold">3.5</td></tr>
+                            <tr><td class="py-2 px-3">1. Self Care</td><td class="py-2 px-3 text-center font-bold">1.5</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -229,19 +215,18 @@
         </div>
     </div>
 
-    <!-- Footer with Real Visitor Counter -->
+    <!-- Footer -->
     <div class="text-center mt-8 mb-8 text-gray-500 space-y-4">
-        
         <div class="text-sm font-medium opacity-75">
-            Copyright &copy; by พว.วิษณุกรณ์ โอยา(รพ.ชลบุรี)
+            ผู้ตรวจสอบโปรแกรม : อาจารย์อิชยา สุวรรณกุล
+            <br>
+            พัฒนาโดย พว.วิษณุกรณ์ โอยา(รพ.ชลบุรี)
         </div>
-
-        <div class="flex justify-center items-center opacity-90 hover:opacity-100 transition-opacity">
-            <a href="https://www.freecounterstat.com" title="free hit counters">
+        <div class="flex justify-center items-center opacity-90">
+             <a href="https://www.freecounterstat.com" title="free hit counters">
                 <img src="https://counter1.optistats.ovh/private/freecounterstat.php?c=dfxnuny3jue2bh5nbg7b8nz8mg4n1hhp" border="0" title="free hit counters" alt="free hit counters">
             </a>
         </div>
-        
     </div>
 
     <script>
@@ -257,28 +242,61 @@
         }
 
         function calculate() {
+            // 1. รับค่าตัวแปร
             let adc = parseFloat(document.getElementById('adc').value) || 0;
             let nhppd = parseFloat(document.getElementById('nhppd').value) || 0;
             let constant = parseFloat(document.getElementById('constant').value) || 0;
             let benefit = parseFloat(document.getElementById('benefit').value) || 0;
             let hours = parseFloat(document.getElementById('workHours').value) || 1;
+            let staffPct = parseFloat(document.getElementById('staffPercentage').value) || 1; // % productivity
 
+            // 2. รับค่า % เวร
+            let pM = parseFloat(document.getElementById('pctMorning').value) || 0;
+            let pA = parseFloat(document.getElementById('pctAfternoon').value) || 0;
+            let pN = parseFloat(document.getElementById('pctNight').value) || 0;
+            
+            // แสดงยอดรวม % เวร (เตือนถ้าไม่ครบ 100)
+            let totalPctShift = pM + pA + pN;
+            let totalPctEl = document.getElementById('totalShiftPct');
+            totalPctEl.innerText = totalPctShift;
+            if(totalPctShift !== 100) {
+                totalPctEl.parentElement.classList.add('text-red-500');
+                totalPctEl.parentElement.classList.remove('text-blue-500');
+            } else {
+                totalPctEl.parentElement.classList.remove('text-red-500');
+                totalPctEl.parentElement.classList.add('text-blue-500');
+            }
+
+            // 3. คำนวณ FTE เต็ม (100%)
             let totalFTE = (adc * nhppd * constant * benefit) / hours;
             document.getElementById('totalStaff').innerText = totalFTE.toFixed(2);
 
-            let headCount = (totalFTE * 2368) / 2080;
+            // 4. คำนวณ Headcount ตาม % ที่เลือก (Default 70%)
+            let fullHeadCount = (totalFTE * 2368) / 2080;
+            let adjustedHeadCount = fullHeadCount * staffPct;
             
-            document.getElementById('headCountResult').innerText = headCount.toFixed(2);
+            document.getElementById('headCountResult').innerText = adjustedHeadCount.toFixed(2);
+            document.getElementById('displayPct').innerText = Math.round(staffPct * 100);
+            
+            // แสดงสูตร Headcount แบบ dynamic
             document.getElementById('formulaDetail').innerText = 
-                `( ${totalFTE.toFixed(2)} x 2,368 ) / 2,080`;
+                `( (${fullHeadCount.toFixed(2)} คน) x ${Math.round(staffPct * 100)}% )`;
 
+            // 5. คำนวณเวร (Daily Working Staff)
+            // Daily Staff คิดจาก FTE (เพราะ FTE คือภาระงานต่อวันที่มี Benefit แล้ว)
+            // หรือคิดจาก Headcount ก็ได้ แต่นิยมคิดจาก FTE พื้นฐานแล้วหาร Benefit เพื่อหาคนทำงานจริงต่อวัน
             let dailyStaff = totalFTE / benefit; 
             
-            document.getElementById('shiftMorning').innerText = Math.round(dailyStaff * 0.6);
-            document.getElementById('shiftAfternoon').innerText = Math.round(dailyStaff * 0.25);
-            document.getElementById('shiftNight').innerText = Math.round(dailyStaff * 0.15);
+            // ปรับ Daily Staff ตาม Productivity ด้วยไหม? 
+            // ปกติถ้าลดคน (Headcount 70%) คนขึ้นเวรจริงก็จะลดลงตามสัดส่วน
+            let adjustedDailyStaff = dailyStaff * staffPct;
+
+            document.getElementById('shiftMorning').innerText = Math.round(adjustedDailyStaff * (pM / 100));
+            document.getElementById('shiftAfternoon').innerText = Math.round(adjustedDailyStaff * (pA / 100));
+            document.getElementById('shiftNight').innerText = Math.round(adjustedDailyStaff * (pN / 100));
         }
 
+        // เริ่มต้นคำนวณทันที
         calculate();
     </script>
 
