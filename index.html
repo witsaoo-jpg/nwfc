@@ -1066,6 +1066,31 @@
                         </tr>
                     </tbody>
                 </table>
+                <tr>
+                            <td class="p-2">1. Self Care (1.5)</td>
+                            <td class="p-1"><input type="number" id="d_pt_1" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex items-center justify-between bg-gray-100 p-3 rounded-lg border border-gray-200">
+                <label class="text-sm font-bold text-gray-700">เลือกสัดส่วน (Productivity):</label>
+                <select id="d_staffPercentage" onchange="calcDaily()" class="bg-white border border-gray-300 text-gray-700 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2 w-48 font-bold">
+                    <option value="1">100% (เต็มกรอบ)</option>
+                    <option value="0.95">95%</option>
+                    <option value="0.9">90%</option>
+                    <option value="0.85">85%</option>
+                    <option value="0.8">80%</option>
+                    <option value="0.75">75%</option>
+                    <option value="0.7">70% (ขั้นต่ำ)</option>
+                    <option value="0.6">60%</option>
+                </select>
+            </div>
+            <div class="bg-gray-800 text-white rounded-xl p-5 text-center relative overflow-hidden shadow-inner">
+                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-blue-500"></div>
+                 ```
+
+**สรุปง่ายๆ:** มองหาแท็ก `</table>` (ปิดตาราง) แล้วกด Enter ขึ้นบรรทัดใหม่ แล้ววางโค้ดชุดนี้ลงไป ก่อนที่จะถึง `<div class="bg-gray-800 ...">` ครับผม!
             </div>
 
 <div class="bg-gray-800 text-white rounded-xl p-5 text-center relative overflow-hidden shadow-inner">
@@ -1110,25 +1135,24 @@
 <script>
     // --- ฟังก์ชันสำหรับ Modal รายวัน ---
     function openDailyModal() {
-        // 1. ดึงข้อมูลจากหน้าหลักมาใส่ใน Modal เป็นค่าเริ่มต้น
+        // 1. ดึงข้อมูลจำนวนคนไข้จากหน้าหลัก
         for(let i=1; i<=5; i++) {
             document.getElementById(`d_pt_${i}`).value = document.getElementById(`pt_${i}`).value;
         }
-        // 2. คำนวณทันที
+        
+        // 2. [เพิ่มใหม่] ดึงค่า Productivity จากหน้าหลักมาใส่ใน Modal
+        let mainPct = document.getElementById('staffPercentage').value;
+        document.getElementById('d_staffPercentage').value = mainPct;
+
+        // 3. คำนวณทันที
         calcDaily();
-        // 3. แสดง Modal
+        // 4. แสดง Modal
         document.getElementById('dailyModal').classList.remove('hidden');
     }
-
-    function closeDailyModal() {
-        document.getElementById('dailyModal').classList.add('hidden');
-    }
-
     function calcDaily() {
         // 1. คำนวณ NHPPD รวม
         let totalHr = 0;
         let totalPt = 0;
-        // ตรวจสอบค่าชั่วโมงจากหน้าจอหลัก (เผื่อมีการแก้ค่ามาตรฐาน) หรือใช้ค่า Default
         const hoursMap = {
             1: parseFloat(document.getElementById('hr_1').value) || 1.5, 
             2: parseFloat(document.getElementById('hr_2').value) || 3.5, 
@@ -1146,30 +1170,25 @@
         document.getElementById('d_census').value = totalPt;
         document.getElementById('d_total_hours').value = totalHr.toFixed(1);
 
-        // 2. ดึงค่าตัวแปร (Work Hours & Productivity)
-        let workHrs = parseFloat(document.getElementById('workHours').value) || 7; // ดึงชั่วโมงทำงานจากหน้าหลัก
-        let pct = parseFloat(document.getElementById('staffPercentage').value) || 1;
+        // 2. [แก้จุดนี้] ดึงค่า Productivity จากตัวเลือกใน Modal แทน
+        let workHrs = parseFloat(document.getElementById('workHours').value) || 7;
+        let pct = parseFloat(document.getElementById('d_staffPercentage').value) || 1; // ใช้ ID d_staffPercentage
         
-        // 3. คำนวณความต้องการคน (Staff Needed)
-        // สูตร: (Total Hours / Work Hours) * Productivity
+        // 3. คำนวณความต้องการคน
         let rawStaff = totalHr / workHrs;
         let finalStaff = rawStaff * pct; 
         
         document.getElementById('d_staff_result').innerText = finalStaff.toFixed(1);
 
-        // [เพิ่มใหม่] อัปเดตข้อความแสดงสูตร
-        // ตัวอย่าง: ( 120.5 ชม. ÷ 7 ชม. ) × 100%
+        // แสดงสูตร
         document.getElementById('d_formula_explain').innerHTML = 
             `( <span class="text-yellow-400">${totalHr.toFixed(1)}</span> ชม. ÷ ${workHrs} ชม. ) × ${Math.round(pct*100)}%`;
 
         // 4. แบ่งเวร (40:30:30)
-        // ใช้ Math.round เพื่อให้ได้จำนวนคนเป็นจำนวนเต็ม
         let m = Math.round(finalStaff * 0.4);
         let a = Math.round(finalStaff * 0.3);
         let n = Math.round(finalStaff * 0.3);
         
-        // ปรับแก้เศษทศนิยม (ถ้าปัดเศษแล้วยอดรวมไม่เท่ากับยอดหลัก ให้เติมเวรเช้า/บ่าย)
-        // แต่เพื่อความง่ายในการแสดงผลรายวัน ใช้ค่าโดยประมาณถือว่ายอมรับได้
         document.getElementById('d_shift_m').innerText = m;
         document.getElementById('d_shift_a').innerText = a;
         document.getElementById('d_shift_n').innerText = n;
