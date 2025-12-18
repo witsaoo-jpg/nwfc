@@ -59,7 +59,8 @@
         </div>
 
         <div class="p-6 space-y-6">
-<div class="bg-gray-50 p-4 rounded-lg border border-gray-300 shadow-sm relative">
+
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-300 shadow-sm relative">
                 <div class="absolute top-0 right-0 -mt-2 -mr-2 w-4 h-4 bg-red-500 rounded-full animate-ping hidden" id="saveIndicator"></div>
                 <h3 class="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider border-b border-gray-200 pb-2">
                     จัดการข้อมูลหน่วยงาน (Unit Management)
@@ -81,14 +82,7 @@
                     </div>
                 </div>
                 
-                <div class="flex justify-center mb-4">
-                    <button onclick="openDailyModal()" class="w-full md:w-auto bg-orange-500 hover:bg-orange-600 text-white px-8 py-2 rounded-full shadow-md font-bold flex items-center justify-center gap-2 transition transform hover:scale-105 border border-orange-400">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        คำนวณเวรประจำวัน (Daily Staffing)
-                    </button>
-                </div>
-                
-                <div class="flex flex-wrap gap-2 pt-2 border-t border-gray-200">
+                <div class="flex flex-wrap gap-2 pt-2 border-t border-gray-200 mt-4">
                     <button onclick="saveUnit()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow flex items-center transition text-sm font-semibold">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
                         บันทึก (Save)
@@ -533,6 +527,120 @@
             </div>
         </div>
     </div>
+    
+    <div id="dailyModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform scale-100 transition-transform duration-300">
+            
+            <div class="bg-orange-500 p-4 flex justify-between items-center sticky top-0 z-10">
+                <h3 class="text-white font-bold text-lg flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    คำนวณจัดเวรประจำวัน (Daily Staffing)
+                </h3>
+                <button onclick="closeDailyModal()" class="text-white hover:bg-orange-600 rounded-full p-1 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <div class="bg-orange-50 p-3 rounded-lg border border-orange-100 text-sm text-orange-800">
+                    💡 <strong>โหมดรายวัน:</strong> ข้อมูลในหน้านี้จะแยกอิสระจากหน้าหลัก คุณสามารถปรับเปลี่ยนจำนวนผู้ป่วยได้ตามหน้างานจริงวันนี้
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">ผู้ป่วยวันนี้ (Census)</label>
+                        <input type="number" id="d_census" class="w-full p-2 border border-gray-300 rounded text-center font-bold text-xl text-blue-600" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">ภาระงานรวม (Total Hours)</label>
+                        <input type="number" id="d_total_hours" class="w-full p-2 border border-gray-300 rounded text-center font-bold text-xl text-gray-600 bg-gray-50" readonly>
+                    </div>
+                </div>
+
+                <div class="border rounded-lg overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-100 text-gray-700">
+                            <tr>
+                                <th class="py-2 px-3 text-left">ประเภท</th>
+                                <th class="py-2 px-3 text-center w-24">จำนวนคน</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr>
+                                <td class="p-2">5. Intensive (12.0)</td>
+                                <td class="p-1"><input type="number" id="d_pt_5" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">4. Mod. Intensive (7.5)</td>
+                                <td class="p-1"><input type="number" id="d_pt_4" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">3. Intermediate (5.5)</td>
+                                <td class="p-1"><input type="number" id="d_pt_3" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">2. Minimal (3.5)</td>
+                                <td class="p-1"><input type="number" id="d_pt_2" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">1. Self Care (1.5)</td>
+                                <td class="p-1"><input type="number" id="d_pt_1" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex items-center justify-between bg-gray-100 p-3 rounded-lg border border-gray-200">
+                    <label class="text-sm font-bold text-gray-700">เลือกสัดส่วน (Productivity):</label>
+                    <select id="d_staffPercentage" onchange="calcDaily()" class="bg-white border border-gray-300 text-gray-700 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2 w-48 font-bold">
+                        <option value="1">100% (เต็มกรอบ)</option>
+                        <option value="0.95">95%</option>
+                        <option value="0.9">90%</option>
+                        <option value="0.85">85%</option>
+                        <option value="0.8">80%</option>
+                        <option value="0.75">75%</option>
+                        <option value="0.7">70% (ขั้นต่ำ)</option>
+                        <option value="0.6">60%</option>
+                    </select>
+                </div>
+                
+                <div class="bg-gray-800 text-white rounded-xl p-5 text-center relative overflow-hidden shadow-inner">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-blue-500"></div>
+                    <p class="text-gray-400 text-xs uppercase tracking-widest mb-2">ความต้องการพยาบาล (24 ชม.)</p>
+                    
+                    <div class="flex justify-center items-end gap-2">
+                        <span id="d_staff_result" class="text-5xl font-bold text-green-400">0.0</span>
+                        <span class="text-lg text-gray-400 mb-2">คน</span>
+                    </div>
+
+                    <div class="mt-3 pt-3 border-t border-gray-700">
+                        <p class="text-xs text-gray-400 font-mono" id="d_formula_explain">
+                            ( ... )
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="bg-blue-50 p-3 rounded border border-blue-200">
+                        <p class="text-xs text-blue-800 font-bold mb-1">เวรเช้า (40%)</p>
+                        <p id="d_shift_m" class="text-2xl font-bold text-blue-600">0</p>
+                    </div>
+                    <div class="bg-orange-50 p-3 rounded border border-orange-200">
+                        <p class="text-xs text-orange-800 font-bold mb-1">เวรบ่าย (30%)</p>
+                        <p id="d_shift_a" class="text-2xl font-bold text-orange-600">0</p>
+                    </div>
+                    <div class="bg-indigo-50 p-3 rounded border border-indigo-200">
+                        <p class="text-xs text-indigo-800 font-bold mb-1">เวรดึก (30%)</p>
+                        <p id="d_shift_n" class="text-2xl font-bold text-indigo-600">0</p>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="bg-gray-50 p-4 flex justify-end gap-2 border-t">
+                <button onclick="closeDailyModal()" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded text-gray-800 font-bold transition">ปิดหน้าต่าง</button>
+            </div>
+        </div>
+    </div>
 
     <script>
       if ('serviceWorker' in navigator) {
@@ -569,6 +677,7 @@
     <script>
         // --- Global Variables ---
         let myChart = null;
+        let currentMode = 'annual'; // ตัวแปรบอกสถานะโหมด
 
         function updatePreset() {
             const type = document.getElementById('wardType').value;
@@ -627,6 +736,33 @@
             let hours = parseFloat(document.getElementById('workHours').value) || 1;
             let staffPct = parseFloat(document.getElementById('staffPercentage').value) || 1; 
 
+            // 1. คำนวณยอดดิบ (Raw Requirement)
+            let baseResult = (adc * nhppd * constant * benefit) / hours;
+            
+            document.getElementById('totalStaff').innerText = baseResult.toFixed(2);
+
+            // 2. แปลงเป็น Headcount (จำนวนคน)
+            let adjustedHeadCount;
+
+            if (currentMode === 'daily') {
+                // *** กรณีรายวัน (Seamless) ***
+                adjustedHeadCount = baseResult * staffPct;
+                
+                document.getElementById('formulaDetail').innerText = 
+                    `(คำนวณจากความต้องการวันนี้ x สัดส่วนที่เลือก)`;
+            } else {
+                // *** กรณีแผนรายปี FTE ***
+                let fullHeadCount = (baseResult * 2368) / 2080;
+                adjustedHeadCount = fullHeadCount * staffPct;
+                
+                document.getElementById('formulaDetail').innerText = 
+                    `(คำนวณจาก FTE x สัดส่วนที่เลือก)`;
+            }
+
+            document.getElementById('headCountResult').innerText = adjustedHeadCount.toFixed(2);
+            document.getElementById('displayPct').innerText = Math.round(staffPct * 100);
+            
+            // 3. แบ่งเวร
             let pM = parseFloat(document.getElementById('pctMorning').value) || 0;
             let pA = parseFloat(document.getElementById('pctAfternoon').value) || 0;
             let pN = parseFloat(document.getElementById('pctNight').value) || 0;
@@ -642,27 +778,10 @@
                 totalPctEl.parentElement.classList.add('text-blue-500');
             }
 
-            let totalFTE = (adc * nhppd * constant * benefit) / hours;
-            document.getElementById('totalStaff').innerText = totalFTE.toFixed(2);
-
-            let fullHeadCount = (totalFTE * 2368) / 2080;
-            let adjustedHeadCount = fullHeadCount * staffPct;
-            
-            document.getElementById('headCountResult').innerText = adjustedHeadCount.toFixed(2);
-            document.getElementById('displayPct').innerText = Math.round(staffPct * 100);
-            
-            document.getElementById('formulaDetail').innerText = 
-                `(คำนวณจาก FTE x สัดส่วนที่เลือก)`;
-
-            let dailyStaff = totalFTE / benefit; 
-            // If in Daily mode, totalFTE already excludes benefit, so dailyStaff = totalFTE basically
-            // But we use the adjustedHeadCount logic which is standard.
-            
-            let adjustedDailyStaff = adjustedHeadCount; 
-
-            document.getElementById('shiftMorning').innerText = Math.round(adjustedDailyStaff * (pM / 100));
-            document.getElementById('shiftAfternoon').innerText = Math.round(adjustedDailyStaff * (pA / 100));
-            document.getElementById('shiftNight').innerText = Math.round(adjustedDailyStaff * (pN / 100));
+            let dailyStaff = adjustedHeadCount; 
+            document.getElementById('shiftMorning').innerText = Math.round(dailyStaff * (pM / 100));
+            document.getElementById('shiftAfternoon').innerText = Math.round(dailyStaff * (pA / 100));
+            document.getElementById('shiftNight').innerText = Math.round(dailyStaff * (pN / 100));
             
             calculateGap(adjustedHeadCount);
         }
@@ -918,8 +1037,9 @@
             }
         });
 
-        // --- [UPDATE] ฟังก์ชันสลับโหมด รายปี vs รายวัน ---
+        // --- ฟังก์ชันสลับโหมด รายปี vs รายวัน ---
         function switchMode(mode) {
+            currentMode = mode;
             const btnAnnual = document.getElementById('btnAnnual');
             const btnDaily = document.getElementById('btnDaily');
             const labelADC = document.getElementById('adcSubtext');
@@ -930,10 +1050,11 @@
             const inpBenefit = document.getElementById('benefit');
 
             if (mode === 'daily') {
-                // โหมดรายวัน
+                // --- โหมดรายวัน ---
                 btnAnnual.className = "px-6 py-2 rounded-md text-sm font-bold transition-all duration-300 text-gray-500 hover:text-gray-700 w-40";
                 btnDaily.className = "px-6 py-2 rounded-md text-sm font-bold transition-all duration-300 shadow bg-orange-500 text-white w-40";
                 
+                // ปรับค่าคงที่ให้เป็น 1 เพื่อให้สูตรคำนวณออกมาเป็นรายวัน
                 inpConst.value = 1;
                 inpBenefit.value = 1;
                 inpConst.disabled = true;
@@ -942,13 +1063,20 @@
                 inpBenefit.classList.add('bg-gray-100', 'text-gray-400');
 
                 labelADC.innerHTML = 'จำนวนผู้ป่วยวันนี้ (Today Census)';
-                labelStep4.innerHTML = 'ความต้องการพยาบาลใน 24 ชม. (Daily Staff)';
-                labelCurrent.innerText = 'จนท.ที่จัดเวรไว้ (Scheduled Staff)';
+                labelStep4.innerHTML = 'ความต้องการพยาบาลวันนี้ (Daily Need)';
+                labelCurrent.innerText = 'จนท.ที่ขึ้นเวรจริง (Scheduled Staff)';
+                
+                document.getElementById('totalStaff').nextElementSibling.innerText = "Staff Required (Today)";
+
+                // >>>>>> เพิ่ม: สั่งเปิด Popup ทันที <<<<<<
+                openDailyModal();
+
             } else {
-                // โหมดรายปี
+                // --- โหมดแผนรายปี ---
                 btnAnnual.className = "px-6 py-2 rounded-md text-sm font-bold transition-all duration-300 shadow bg-white text-blue-600 w-40";
                 btnDaily.className = "px-6 py-2 rounded-md text-sm font-bold transition-all duration-300 text-gray-500 hover:text-gray-700 w-40";
                 
+                // คืนค่าคงที่มาตรฐาน FTE
                 inpConst.value = 1.4;
                 inpBenefit.value = 1.14;
                 inpConst.disabled = false;
@@ -959,6 +1087,8 @@
                 labelADC.innerHTML = 'Average Daily Census (คน/วัน)';
                 labelStep4.innerHTML = 'ขั้นตอนที่4 อัตรากำลัง FTE ที่ต้องการ (100%)';
                 labelCurrent.innerText = 'จำนวนคนที่มีอยู่จริง (Current Staff)';
+                
+                document.getElementById('totalStaff').nextElementSibling.innerText = "Full Time Equivalent";
             }
             calculate();
         }
@@ -1004,195 +1134,76 @@
                 element.classList.add('hidden'); 
             });
         }
+        
+        // --- ฟังก์ชันสำหรับ Modal รายวัน ---
+        function openDailyModal() {
+            // 1. ดึงข้อมูลจำนวนคนไข้จากหน้าหลัก
+            for(let i=1; i<=5; i++) {
+                document.getElementById(`d_pt_${i}`).value = document.getElementById(`pt_${i}`).value;
+            }
+            
+            // 2. ดึงค่า Productivity จากหน้าหลักมาใส่ใน Modal
+            let mainPct = document.getElementById('staffPercentage').value;
+            document.getElementById('d_staffPercentage').value = mainPct;
+
+            // 3. คำนวณทันที
+            calcDaily();
+            // 4. แสดง Modal
+            document.getElementById('dailyModal').classList.remove('hidden');
+        }
+
+        function calcDaily() {
+            // 1. คำนวณ NHPPD รวม
+            let totalHr = 0;
+            let totalPt = 0;
+            const hoursMap = {
+                1: parseFloat(document.getElementById('hr_1').value) || 1.5, 
+                2: parseFloat(document.getElementById('hr_2').value) || 3.5, 
+                3: parseFloat(document.getElementById('hr_3').value) || 5.5, 
+                4: parseFloat(document.getElementById('hr_4').value) || 7.5, 
+                5: parseFloat(document.getElementById('hr_5').value) || 12.0
+            };
+
+            for(let i=1; i<=5; i++) {
+                let pt = parseFloat(document.getElementById(`d_pt_${i}`).value) || 0;
+                totalPt += pt;
+                totalHr += pt * hoursMap[i];
+            }
+
+            document.getElementById('d_census').value = totalPt;
+            document.getElementById('d_total_hours').value = totalHr.toFixed(1);
+
+            // 2. ดึงค่า Productivity จากตัวเลือกใน Modal แทน
+            let workHrs = parseFloat(document.getElementById('workHours').value) || 7;
+            let pct = parseFloat(document.getElementById('d_staffPercentage').value) || 1; 
+            
+            // 3. คำนวณความต้องการคน
+            let rawStaff = totalHr / workHrs;
+            let finalStaff = rawStaff * pct; 
+            
+            document.getElementById('d_staff_result').innerText = finalStaff.toFixed(1);
+
+            // แสดงสูตร
+            document.getElementById('d_formula_explain').innerHTML = 
+                `( <span class="text-yellow-400">${totalHr.toFixed(1)}</span> ชม. ÷ ${workHrs} ชม. ) × ${Math.round(pct*100)}%`;
+
+            // 4. แบ่งเวร (40:30:30)
+            let m = Math.round(finalStaff * 0.4);
+            let a = Math.round(finalStaff * 0.3);
+            let n = Math.round(finalStaff * 0.3);
+            
+            document.getElementById('d_shift_m').innerText = m;
+            document.getElementById('d_shift_a').innerText = a;
+            document.getElementById('d_shift_n').innerText = n;
+        }
+
+        // ฟังก์ชันปิดหน้าต่าง Pop-up
+        function closeDailyModal() {
+            document.getElementById('dailyModal').classList.add('hidden');
+        }
 
         calculate();
         calcNHPPDTable();
     </script>
-<div id="dailyModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform scale-100 transition-transform duration-300">
-        
-        <div class="bg-orange-500 p-4 flex justify-between items-center sticky top-0 z-10">
-            <h3 class="text-white font-bold text-lg flex items-center">
-                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                คำนวณจัดเวรประจำวัน (Daily Staffing)
-            </h3>
-            <button onclick="closeDailyModal()" class="text-white hover:bg-orange-600 rounded-full p-1 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-        </div>
-
-        <div class="p-6 space-y-6">
-            <div class="bg-orange-50 p-3 rounded-lg border border-orange-100 text-sm text-orange-800">
-                💡 <strong>โหมดรายวัน:</strong> ข้อมูลในหน้านี้จะแยกอิสระจากหน้าหลัก คุณสามารถปรับเปลี่ยนจำนวนผู้ป่วยได้ตามหน้างานจริงวันนี้
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">ผู้ป่วยวันนี้ (Census)</label>
-                    <input type="number" id="d_census" class="w-full p-2 border border-gray-300 rounded text-center font-bold text-xl text-blue-600" readonly>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">ภาระงานรวม (Total Hours)</label>
-                    <input type="number" id="d_total_hours" class="w-full p-2 border border-gray-300 rounded text-center font-bold text-xl text-gray-600 bg-gray-50" readonly>
-                </div>
-            </div>
-
-            <div class="border rounded-lg overflow-hidden">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-100 text-gray-700">
-                        <tr>
-                            <th class="py-2 px-3 text-left">ประเภท</th>
-                            <th class="py-2 px-3 text-center w-24">จำนวนคน</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        <tr>
-                            <td class="p-2">5. Intensive (12.0)</td>
-                            <td class="p-1"><input type="number" id="d_pt_5" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
-                        </tr>
-                        <tr>
-                            <td class="p-2">4. Mod. Intensive (7.5)</td>
-                            <td class="p-1"><input type="number" id="d_pt_4" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
-                        </tr>
-                        <tr>
-                            <td class="p-2">3. Intermediate (5.5)</td>
-                            <td class="p-1"><input type="number" id="d_pt_3" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
-                        </tr>
-                        <tr>
-                            <td class="p-2">2. Minimal (3.5)</td>
-                            <td class="p-1"><input type="number" id="d_pt_2" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
-                        </tr>
-                        <tr>
-                            <td class="p-2">1. Self Care (1.5)</td>
-                            <td class="p-1"><input type="number" id="d_pt_1" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <tr>
-                            <td class="p-2">1. Self Care (1.5)</td>
-                            <td class="p-1"><input type="number" id="d_pt_1" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="flex items-center justify-between bg-gray-100 p-3 rounded-lg border border-gray-200">
-                <label class="text-sm font-bold text-gray-700">เลือกสัดส่วน (Productivity):</label>
-                <select id="d_staffPercentage" onchange="calcDaily()" class="bg-white border border-gray-300 text-gray-700 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2 w-48 font-bold">
-                    <option value="1">100% (เต็มกรอบ)</option>
-                    <option value="0.95">95%</option>
-                    <option value="0.9">90%</option>
-                    <option value="0.85">85%</option>
-                    <option value="0.8">80%</option>
-                    <option value="0.75">75%</option>
-                    <option value="0.7">70% (ขั้นต่ำ)</option>
-                    <option value="0.6">60%</option>
-                </select>
-            </div>
-           
-<div class="bg-gray-800 text-white rounded-xl p-5 text-center relative overflow-hidden shadow-inner">
-     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-blue-500"></div>
-     <p class="text-gray-400 text-xs uppercase tracking-widest mb-2">ความต้องการพยาบาล (24 ชม.)</p>
-     
-     <div class="flex justify-center items-end gap-2">
-         <span id="d_staff_result" class="text-5xl font-bold text-green-400">0.0</span>
-         <span class="text-lg text-gray-400 mb-2">คน</span>
-     </div>
-
-     <div class="mt-3 pt-3 border-t border-gray-700">
-        <p class="text-xs text-gray-400 font-mono" id="d_formula_explain">
-            ( ... )
-        </p>
-     </div>
-</div>
-
-            <div class="grid grid-cols-3 gap-3 text-center">
-                <div class="bg-blue-50 p-3 rounded border border-blue-200">
-                    <p class="text-xs text-blue-800 font-bold mb-1">เวรเช้า (40%)</p>
-                    <p id="d_shift_m" class="text-2xl font-bold text-blue-600">0</p>
-                </div>
-                <div class="bg-orange-50 p-3 rounded border border-orange-200">
-                    <p class="text-xs text-orange-800 font-bold mb-1">เวรบ่าย (30%)</p>
-                    <p id="d_shift_a" class="text-2xl font-bold text-orange-600">0</p>
-                </div>
-                <div class="bg-indigo-50 p-3 rounded border border-indigo-200">
-                    <p class="text-xs text-indigo-800 font-bold mb-1">เวรดึก (30%)</p>
-                    <p id="d_shift_n" class="text-2xl font-bold text-indigo-600">0</p>
-                </div>
-            </div>
-            
-        </div>
-        
-        <div class="bg-gray-50 p-4 flex justify-end gap-2 border-t">
-            <button onclick="closeDailyModal()" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded text-gray-800 font-bold transition">ปิดหน้าต่าง</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    // --- ฟังก์ชันสำหรับ Modal รายวัน ---
-    function openDailyModal() {
-        // 1. ดึงข้อมูลจำนวนคนไข้จากหน้าหลัก
-        for(let i=1; i<=5; i++) {
-            document.getElementById(`d_pt_${i}`).value = document.getElementById(`pt_${i}`).value;
-        }
-        
-        // 2. [เพิ่มใหม่] ดึงค่า Productivity จากหน้าหลักมาใส่ใน Modal
-        let mainPct = document.getElementById('staffPercentage').value;
-        document.getElementById('d_staffPercentage').value = mainPct;
-
-        // 3. คำนวณทันที
-        calcDaily();
-        // 4. แสดง Modal
-        document.getElementById('dailyModal').classList.remove('hidden');
-    }
-    function calcDaily() {
-        // 1. คำนวณ NHPPD รวม
-        let totalHr = 0;
-        let totalPt = 0;
-        const hoursMap = {
-            1: parseFloat(document.getElementById('hr_1').value) || 1.5, 
-            2: parseFloat(document.getElementById('hr_2').value) || 3.5, 
-            3: parseFloat(document.getElementById('hr_3').value) || 5.5, 
-            4: parseFloat(document.getElementById('hr_4').value) || 7.5, 
-            5: parseFloat(document.getElementById('hr_5').value) || 12.0
-        };
-
-        for(let i=1; i<=5; i++) {
-            let pt = parseFloat(document.getElementById(`d_pt_${i}`).value) || 0;
-            totalPt += pt;
-            totalHr += pt * hoursMap[i];
-        }
-
-        document.getElementById('d_census').value = totalPt;
-        document.getElementById('d_total_hours').value = totalHr.toFixed(1);
-
-        // 2. [แก้จุดนี้] ดึงค่า Productivity จากตัวเลือกใน Modal แทน
-        let workHrs = parseFloat(document.getElementById('workHours').value) || 7;
-        let pct = parseFloat(document.getElementById('d_staffPercentage').value) || 1; // ใช้ ID d_staffPercentage
-        
-        // 3. คำนวณความต้องการคน
-        let rawStaff = totalHr / workHrs;
-        let finalStaff = rawStaff * pct; 
-        
-        document.getElementById('d_staff_result').innerText = finalStaff.toFixed(1);
-
-        // แสดงสูตร
-        document.getElementById('d_formula_explain').innerHTML = 
-            `( <span class="text-yellow-400">${totalHr.toFixed(1)}</span> ชม. ÷ ${workHrs} ชม. ) × ${Math.round(pct*100)}%`;
-
-        // 4. แบ่งเวร (40:30:30)
-        let m = Math.round(finalStaff * 0.4);
-        let a = Math.round(finalStaff * 0.3);
-        let n = Math.round(finalStaff * 0.3);
-        
-        document.getElementById('d_shift_m').innerText = m;
-        document.getElementById('d_shift_a').innerText = a;
-        document.getElementById('d_shift_n').innerText = n;
-    }
-    // ฟังก์ชันปิดหน้าต่าง Pop-up
-    function closeDailyModal() {
-        document.getElementById('dailyModal').classList.add('hidden');
-    }
-</script>
 </body>
 </html>
