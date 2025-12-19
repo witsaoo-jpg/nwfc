@@ -1153,57 +1153,64 @@
         }
 
         function calcDaily() {
-            // 1. คำนวณ NHPPD รวม
-            let totalHr = 0;
-            let totalPt = 0;
-            const hoursMap = {
-                1: parseFloat(document.getElementById('hr_1').value) || 1.5, 
-                2: parseFloat(document.getElementById('hr_2').value) || 3.5, 
-                3: parseFloat(document.getElementById('hr_3').value) || 5.5, 
-                4: parseFloat(document.getElementById('hr_4').value) || 7.5, 
-                5: parseFloat(document.getElementById('hr_5').value) || 12.0
-            };
+        // 1. คำนวณ NHPPD รวม (ดึงค่าจากหน้าหลักมาคำนวณตามจำนวนคนไข้ใหม่)
+        let totalHr = 0;
+        let totalPt = 0;
+        
+        // ดึงค่า NHPPD ต่อโรคจากหน้าหลัก (hr_1 ถึง hr_5)
+        const hoursMap = {
+            1: parseFloat(document.getElementById('hr_1').value) || 1.5, 
+            2: parseFloat(document.getElementById('hr_2').value) || 3.5, 
+            3: parseFloat(document.getElementById('hr_3').value) || 5.5, 
+            4: parseFloat(document.getElementById('hr_4').value) || 7.5, 
+            5: parseFloat(document.getElementById('hr_5').value) || 12.0
+        };
 
-            for(let i=1; i<=5; i++) {
-                let pt = parseFloat(document.getElementById(`d_pt_${i}`).value) || 0;
-                totalPt += pt;
-                totalHr += pt * hoursMap[i];
-            }
-
-            document.getElementById('d_census').value = totalPt;
-            document.getElementById('d_total_hours').value = totalHr.toFixed(1);
-
-            // 2. ดึงค่า Productivity จากตัวเลือกใน Modal แทน
-            let workHrs = parseFloat(document.getElementById('workHours').value) || 7;
-            let pct = parseFloat(document.getElementById('d_staffPercentage').value) || 1; 
-            
-            // 3. คำนวณความต้องการคน
-            let rawStaff = totalHr / workHrs;
-            let finalStaff = rawStaff * pct; 
-            
-            document.getElementById('d_staff_result').innerText = finalStaff.toFixed(1);
-
-            // แสดงสูตร
-            document.getElementById('d_formula_explain').innerHTML = 
-                `( <span class="text-yellow-400">${totalHr.toFixed(1)}</span> ชม. ÷ ${workHrs} ชม. ) × ${Math.round(pct*100)}%`;
-
-            // 4. แบ่งเวร (40:30:30)
-            let m = Math.round(finalStaff * 0.4);
-            let a = Math.round(finalStaff * 0.3);
-            let n = Math.round(finalStaff * 0.3);
-            
-            document.getElementById('d_shift_m').innerText = m;
-            document.getElementById('d_shift_a').innerText = a;
-            document.getElementById('d_shift_n').innerText = n;
+        // วนลูปคำนวณยอดรวม (Census x Hours)
+        for(let i=1; i<=5; i++) {
+            let pt = parseFloat(document.getElementById(`d_pt_${i}`).value) || 0;
+            totalPt += pt;
+            totalHr += pt * hoursMap[i];
         }
 
-        // ฟังก์ชันปิดหน้าต่าง Pop-up
-        function closeDailyModal() {
-            document.getElementById('dailyModal').classList.add('hidden');
-        }
+        // แสดงผลรวมคนไข้และชั่วโมงงาน
+        document.getElementById('d_census').value = totalPt;
+        document.getElementById('d_total_hours').value = totalHr.toFixed(1);
 
-        calculate();
-        calcNHPPDTable();
-    </script>
+        // 2. ดึงค่าตัวแปร (Productivity และ Work Hours)
+        // ดึงจาก ID workHours (ปกติคือ 7 หรือ 8)
+        let workHrs = parseFloat(document.getElementById('workHours').value) || 7;
+
+        // --- [ส่วนที่แก้ปัญหา] Safety Check ---
+        // ถ้าค่า workHrs น้อยกว่า 4 (เช่น เผลอไปดึงค่า 1.14 มา) ให้บังคับใช้ 7 ทันที
+        if (workHrs < 4) { 
+            workHrs = 7; 
+        }
+        
+        // ดึง % Productivity จาก Dropdown ใน Modal
+        let pct = parseFloat(document.getElementById('d_staffPercentage').value) || 1; 
+        
+        // 3. คำนวณความต้องการคน (สูตร: ชั่วโมงรวม / ชั่วโมงทำงาน x สัดส่วน)
+        let rawStaff = totalHr / workHrs;
+        let finalStaff = rawStaff * pct; 
+        
+        // แสดงผลลัพธ์ตัวเลขใหญ่
+        document.getElementById('d_staff_result').innerText = finalStaff.toFixed(1);
+
+        // แสดงคำอธิบายสูตรด้านล่าง (อัปเดตตัวเลขให้ตรงกับที่ใช้จริง)
+        document.getElementById('d_formula_explain').innerHTML = 
+            `( <span class="text-yellow-400">${totalHr.toFixed(1)}</span> ชม. ÷ ${workHrs} ชม. ) × ${Math.round(pct*100)}%`;
+
+        // 4. แบ่งเวร (สัดส่วน 40:30:30)
+        let m = Math.round(finalStaff * 0.4);
+        let a = Math.round(finalStaff * 0.3);
+        let n = Math.round(finalStaff * 0.3);
+        
+        // แสดงผลแบ่งเวร
+        document.getElementById('d_shift_m').innerText = m;
+        document.getElementById('d_shift_a').innerText = a;
+        document.getElementById('d_shift_n').innerText = n;
+    }
+    </script> 
 </body>
 </html>
