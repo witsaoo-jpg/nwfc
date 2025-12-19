@@ -1136,23 +1136,23 @@
         }
         
         // --- ฟังก์ชันสำหรับ Modal รายวัน ---
-        function openDailyModal() {
-            // 1. ดึงข้อมูลจำนวนคนไข้จากหน้าหลัก
-            for(let i=1; i<=5; i++) {
-                document.getElementById(`d_pt_${i}`).value = document.getElementById(`pt_${i}`).value;
-            }
-            
-            // 2. ดึงค่า Productivity จากหน้าหลักมาใส่ใน Modal
-            let mainPct = document.getElementById('staffPercentage').value;
-            document.getElementById('d_staffPercentage').value = mainPct;
-
-            // 3. คำนวณทันที
-            calcDaily();
-            // 4. แสดง Modal
-            document.getElementById('dailyModal').classList.remove('hidden');
+    function openDailyModal() {
+        // 1. ดึงข้อมูลจำนวนคนไข้จากหน้าหลัก
+        for(let i=1; i<=5; i++) {
+            document.getElementById(`d_pt_${i}`).value = document.getElementById(`pt_${i}`).value;
         }
+        
+        // 2. ดึงค่า Productivity จากหน้าหลักมาใส่ใน Modal
+        let mainPct = document.getElementById('staffPercentage').value;
+        document.getElementById('d_staffPercentage').value = mainPct;
 
-        function calcDaily() {
+        // 3. คำนวณทันที
+        calcDaily();
+        // 4. แสดง Modal
+        document.getElementById('dailyModal').classList.remove('hidden');
+    }
+
+    function calcDaily() {
         // 1. คำนวณ NHPPD รวม (ดึงค่าจากหน้าหลักมาคำนวณตามจำนวนคนไข้ใหม่)
         let totalHr = 0;
         let totalPt = 0;
@@ -1181,7 +1181,7 @@
         // ดึงจาก ID workHours (ปกติคือ 7 หรือ 8)
         let workHrs = parseFloat(document.getElementById('workHours').value) || 7;
 
-        // --- [ส่วนที่แก้ปัญหา] Safety Check ---
+        // --- [Safety Check] ---
         // ถ้าค่า workHrs น้อยกว่า 4 (เช่น เผลอไปดึงค่า 1.14 มา) ให้บังคับใช้ 7 ทันที
         if (workHrs < 4) { 
             workHrs = 7; 
@@ -1210,6 +1210,11 @@
         document.getElementById('d_shift_m').innerText = m;
         document.getElementById('d_shift_a').innerText = a;
         document.getElementById('d_shift_n').innerText = n;
+    }
+
+    // ฟังก์ชันปิดหน้าต่าง Pop-up (ต้องมีส่วนนี้ ปุ่มปิดถึงจะทำงาน)
+    function closeDailyModal() {
+        document.getElementById('dailyModal').classList.add('hidden');
     }
     </script> 
 </body>
