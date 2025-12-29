@@ -376,67 +376,67 @@
             </div>
 
             <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm mt-8">
-    <h3 class="text-gray-700 font-bold text-base mb-4 border-b pb-2 flex items-center">
-        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-        สูตรและที่มาของตัวแปร (Definitions & Formulas)
-    </h3>
-    <div class="space-y-3">
-        <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
-            <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">ADC (จำนวนผู้ป่วยเฉลี่ย)</div>
-            <div class="sm:w-2/3 text-gray-600 pt-1">= จำนวนวันนอนของผู้ป่วยทั้งหมดใน 1 ปี ÷ 365 วัน</div>
-        </div>
-        <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
-            <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">NHPPD (ชั่วโมงการพยาบาล)</div>
-            <div class="sm:w-2/3 text-gray-600 pt-1">= จำนวนชั่วโมงความต้องการ การพยาบาลของผู้ป่วยรวมกันทุกคน ÷ จำนวนผู้ป่วยเฉลี่ยต่อวัน(ADC)</div>
-        </div>
-        <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
-            <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Constant (ค่าคงที่)</div>
-            <div class="sm:w-2/3 text-gray-600 pt-1">= 1.4 (7วัน/5วัน=1.4 คือ อัตรากำลังทดแทนในวันหยุด)</div>
-        </div>
-        <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
-            <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Benefit FTE (ค่าชดเชย)</div>
-            <div class="sm:w-2/3 text-gray-600 pt-1">= (จำนวนชม.ของจนท.1คนต่อปี + non P.H.วันลาวันหยุดนักขัตฤกษ์) ÷ จำนวนชม.ของจนท.1คนต่อปี คือ (2080+288)/2080=1.14(ปกติค่าเฉลี่ยอยู่ที่ 1.14 - 1.17)</div>
-        </div>
-        <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
-            <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">ชม.ทำงาน/วัน</div>
-            <div class="sm:w-2/3 text-gray-600 pt-1">= เวลาขึ้นเวร (8 ชม.) - เวลาพัก (1 ชม.) = 7 ชม.</div>
-        </div>
-            
-        <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm mt-2 border-t pt-2 border-gray-100">
-            <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">FTE (Full-Time Equivalent)</div>
-            <div class="sm:w-2/3 text-gray-600 pt-1">
-                = ค่าเทียบเท่าพนักงานเต็มเวลา (8 ชม. x 5 วัน x 52 สัปดาห์ = 2,080 ชม.) + วันลาตามสิทธิ์ (288 ชม.) <br>
-                <span class="font-bold text-gray-800">ดังนั้น 1 FTE = 2,368 ชม.</span>
+                <h3 class="text-gray-700 font-bold text-base mb-4 border-b pb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    สูตรและที่มาของตัวแปร (Definitions & Formulas)
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">ADC (จำนวนผู้ป่วยเฉลี่ย)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= จำนวนวันนอนของผู้ป่วยทั้งหมดใน 1 ปี ÷ 365 วัน</div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">NHPPD (ชั่วโมงการพยาบาล)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= จำนวนชั่วโมงความต้องการ การพยาบาลของผู้ป่วยรวมกันทุกคน ÷ จำนวนผู้ป่วยเฉลี่ยต่อวัน(ADC)</div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Constant (ค่าคงที่)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= 1.4 (7วัน/5วัน=1.4 คือ อัตรากำลังทดแทนในวันหยุด)</div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Benefit FTE (ค่าชดเชย)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= (จำนวนชม.ของจนท.1คนต่อปี + non P.H.วันลาวันหยุดนักขัตฤกษ์) ÷ จำนวนชม.ของจนท.1คนต่อปี คือ (2080+288)/2080=1.14(ปกติค่าเฉลี่ยอยู่ที่ 1.14 - 1.17)</div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">ชม.ทำงาน/วัน</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= เวลาขึ้นเวร (8 ชม.) - เวลาพัก (1 ชม.) = 7 ชม.</div>
+                    </div>
+                        
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm mt-2 border-t pt-2 border-gray-100">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">FTE (Full-Time Equivalent)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">
+                            = ค่าเทียบเท่าพนักงานเต็มเวลา (8 ชม. x 5 วัน x 52 สัปดาห์ = 2,080 ชม.) + วันลาตามสิทธิ์ (288 ชม.) <br>
+                            <span class="font-bold text-gray-800">ดังนั้น 1 FTE = 2,368 ชม.</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Non-Productive Hours (ชม.ไม่ได้งาน)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= วันลาต่างๆ ตามสิทธิ์รวมประมาณ 36 วัน x 8 ชม. = 288 ชม.</div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Productive Hours (ชม.ที่ได้งาน)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= ชม.ทำงานทั้งปี - ชม.ที่ไม่ได้งาน (2,080 - 288 = 1,792 ชม.)</div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm mt-2 border-t pt-2 border-gray-100">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Productivity (ผลิตภาพ)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">
+                            = (จำนวนชั่วโมงความต้องการการพยาบาลของผู้ป่วย ÷ จำนวนชั่วโมงที่พยาบาลทำงาน) × 100 <br>
+                            <span class="text-xs text-gray-400 italic">(อ้างอิง: กฤษดา แสวงดี, 2545 : 31)</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm bg-yellow-50 p-2 rounded border border-yellow-200 mt-2">
+                        <div class="sm:w-1/3 font-semibold text-yellow-800 bg-yellow-100 px-2 py-1 rounded self-start">Staffing % (70%)</div>
+                        <div class="sm:w-2/3 text-gray-700 pt-1">
+                            = <span class="font-bold">เกณฑ์ขั้นต่ำ (Minimum Requirement)</span> ที่ต้องมีเพื่อให้หอผู้ป่วยเปิดดำเนินการได้โดยปลอดภัย (Patient Safety) 
+                            ในกรณีที่มีข้อจำกัดด้านบุคลากร ไม่สามารถจัดหาอัตรากำลังได้เต็ม 100% ตาม FTE (Full Time Equivalent)
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
-            <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Non-Productive Hours (ชม.ไม่ได้งาน)</div>
-            <div class="sm:w-2/3 text-gray-600 pt-1">= วันลาต่างๆ ตามสิทธิ์รวมประมาณ 36 วัน x 8 ชม. = 288 ชม.</div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
-            <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Productive Hours (ชม.ที่ได้งาน)</div>
-            <div class="sm:w-2/3 text-gray-600 pt-1">= ชม.ทำงานทั้งปี - ชม.ที่ไม่ได้งาน (2,080 - 288 = 1,792 ชม.)</div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm mt-2 border-t pt-2 border-gray-100">
-            <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Productivity (ผลิตภาพ)</div>
-            <div class="sm:w-2/3 text-gray-600 pt-1">
-                = (จำนวนชั่วโมงความต้องการการพยาบาลของผู้ป่วย ÷ จำนวนชั่วโมงที่พยาบาลทำงาน) × 100 <br>
-                <span class="text-xs text-gray-400 italic">(อ้างอิง: กฤษดา แสวงดี, 2545 : 31)</span>
-            </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm bg-yellow-50 p-2 rounded border border-yellow-200 mt-2">
-            <div class="sm:w-1/3 font-semibold text-yellow-800 bg-yellow-100 px-2 py-1 rounded self-start">Staffing % (70%)</div>
-            <div class="sm:w-2/3 text-gray-700 pt-1">
-                = <span class="font-bold">เกณฑ์ขั้นต่ำ (Minimum Requirement)</span> ที่ต้องมีเพื่อให้หอผู้ป่วยเปิดดำเนินการได้โดยปลอดภัย (Patient Safety) 
-                ในกรณีที่มีข้อจำกัดด้านบุคลากร ไม่สามารถจัดหาอัตรากำลังได้เต็ม 100% ตาม FTE (Full Time Equivalent)
-            </div>
-        </div>
-    </div>
-</div>
 
             <div class="bg-orange-50 border border-orange-100 rounded-lg p-5">
                 <h3 class="text-orange-800 font-bold text-sm mb-3">
@@ -634,18 +634,33 @@
                     </div>
                 </div>
 
+                <div class="flex justify-between items-end mb-2 mt-4">
+                    <h4 class="text-sm font-bold text-gray-700">จัดสรรเวร (Shift Distribution)</h4>
+                    <div class="text-xs px-2 py-1 rounded border bg-white" id="d_total_pct_box">
+                        รวม: <span id="d_total_pct_val" class="font-bold">100</span>%
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-3 gap-3 text-center">
-                    <div class="bg-blue-50 p-3 rounded border border-blue-200">
-                        <p class="text-xs text-blue-800 font-bold mb-1">เวรเช้า (40%)</p>
+                    <div class="bg-blue-50 p-2 rounded border border-blue-200 shadow-sm">
+                        <label class="text-[10px] text-blue-800 font-bold block mb-1">เวรเช้า (%)</label>
+                        <input type="number" id="d_pct_m" oninput="calcDaily()" class="w-full text-center border border-blue-300 rounded text-sm font-bold text-blue-700 mb-2 focus:ring-1 focus:ring-blue-500" placeholder="40">
                         <p id="d_shift_m" class="text-2xl font-bold text-blue-600">0</p>
+                        <p class="text-[10px] text-gray-400">คน</p>
                     </div>
-                    <div class="bg-orange-50 p-3 rounded border border-orange-200">
-                        <p class="text-xs text-orange-800 font-bold mb-1">เวรบ่าย (30%)</p>
+
+                    <div class="bg-orange-50 p-2 rounded border border-orange-200 shadow-sm">
+                        <label class="text-[10px] text-orange-800 font-bold block mb-1">เวรบ่าย (%)</label>
+                        <input type="number" id="d_pct_a" oninput="calcDaily()" class="w-full text-center border border-orange-300 rounded text-sm font-bold text-orange-700 mb-2 focus:ring-1 focus:ring-orange-500" placeholder="30">
                         <p id="d_shift_a" class="text-2xl font-bold text-orange-600">0</p>
+                        <p class="text-[10px] text-gray-400">คน</p>
                     </div>
-                    <div class="bg-indigo-50 p-3 rounded border border-indigo-200">
-                        <p class="text-xs text-indigo-800 font-bold mb-1">เวรดึก (30%)</p>
+
+                    <div class="bg-indigo-50 p-2 rounded border border-indigo-200 shadow-sm">
+                        <label class="text-[10px] text-indigo-800 font-bold block mb-1">เวรดึก (%)</label>
+                        <input type="number" id="d_pct_n" oninput="calcDaily()" class="w-full text-center border border-indigo-300 rounded text-sm font-bold text-indigo-700 mb-2 focus:ring-1 focus:ring-indigo-500" placeholder="30">
                         <p id="d_shift_n" class="text-2xl font-bold text-indigo-600">0</p>
+                        <p class="text-[10px] text-gray-400">คน</p>
                     </div>
                 </div>
                 
@@ -1203,16 +1218,21 @@
             });
         }
         
-        // --- ฟังก์ชันสำหรับ Modal รายวัน ---
+        // --- ฟังก์ชันสำหรับ Modal รายวัน (อัปเดตใหม่) ---
     function openDailyModal() {
         // 1. ดึงข้อมูลจำนวนคนไข้จากหน้าหลัก
         for(let i=1; i<=5; i++) {
             document.getElementById(`d_pt_${i}`).value = document.getElementById(`pt_${i}`).value;
         }
         
-        // 2. ดึงค่า Productivity จากหน้าหลักมาใส่ใน Modal
+        // 2. ดึงค่า Productivity จากหน้าหลัก
         let mainPct = document.getElementById('staffPercentage').value;
         document.getElementById('d_staffPercentage').value = mainPct;
+
+        // >>> ใหม่: ดึงค่า % เวรจากหน้าหลักมาเป็นค่าเริ่มต้นใน Modal <<<
+        document.getElementById('d_pct_m').value = document.getElementById('pctMorning').value;
+        document.getElementById('d_pct_a').value = document.getElementById('pctAfternoon').value;
+        document.getElementById('d_pct_n').value = document.getElementById('pctNight').value;
 
         // 3. คำนวณทันที
         calcDaily();
@@ -1221,11 +1241,10 @@
     }
 
     function calcDaily() {
-        // 1. คำนวณ NHPPD รวม (ดึงค่าจากหน้าหลักมาคำนวณตามจำนวนคนไข้ใหม่)
+        // 1. คำนวณ NHPPD รวม
         let totalHr = 0;
         let totalPt = 0;
         
-        // ดึงค่า NHPPD ต่อโรคจากหน้าหลัก (hr_1 ถึง hr_5)
         const hoursMap = {
             1: parseFloat(document.getElementById('hr_1').value) || 1.5, 
             2: parseFloat(document.getElementById('hr_2').value) || 3.5, 
@@ -1234,47 +1253,52 @@
             5: parseFloat(document.getElementById('hr_5').value) || 12.0
         };
 
-        // วนลูปคำนวณยอดรวม (Census x Hours)
         for(let i=1; i<=5; i++) {
             let pt = parseFloat(document.getElementById(`d_pt_${i}`).value) || 0;
             totalPt += pt;
             totalHr += pt * hoursMap[i];
         }
 
-        // แสดงผลรวมคนไข้และชั่วโมงงาน
         document.getElementById('d_census').value = totalPt;
         document.getElementById('d_total_hours').value = totalHr.toFixed(1);
 
-        // 2. ดึงค่าตัวแปร (Productivity และ Work Hours)
-        // ดึงจาก ID workHours (ปกติคือ 7 หรือ 8)
+        // 2. คำนวณจำนวนคนต้องการ (Headcount)
         let workHrs = parseFloat(document.getElementById('workHours').value) || 7;
-
-        // --- [Safety Check] ---
-        // ถ้าค่า workHrs น้อยกว่า 4 (เช่น เผลอไปดึงค่า 1.14 มา) ให้บังคับใช้ 7 ทันที
-        if (workHrs < 4) { 
-            workHrs = 7; 
-        }
+        if (workHrs < 4) workHrs = 7; 
         
-        // ดึง % Productivity จาก Dropdown ใน Modal
         let pct = parseFloat(document.getElementById('d_staffPercentage').value) || 1; 
         
-        // 3. คำนวณความต้องการคน (สูตร: ชั่วโมงรวม / ชั่วโมงทำงาน x สัดส่วน)
         let rawStaff = totalHr / workHrs;
         let finalStaff = rawStaff * pct; 
         
-        // แสดงผลลัพธ์ตัวเลขใหญ่
         document.getElementById('d_staff_result').innerText = finalStaff.toFixed(1);
 
-        // แสดงคำอธิบายสูตรด้านล่าง (อัปเดตตัวเลขให้ตรงกับที่ใช้จริง)
         document.getElementById('d_formula_explain').innerHTML = 
             `( <span class="text-yellow-400">${totalHr.toFixed(1)}</span> ชม. ÷ ${workHrs} ชม. ) × ${Math.round(pct*100)}%`;
 
-        // 4. แบ่งเวร (สัดส่วน 40:30:30)
-        let m = Math.round(finalStaff * 0.4);
-        let a = Math.round(finalStaff * 0.3);
-        let n = Math.round(finalStaff * 0.3);
+        // >>> ใหม่: คำนวณเวร ตาม % ที่กรอกใน Modal <<<
+        let pM = parseFloat(document.getElementById('d_pct_m').value) || 0;
+        let pA = parseFloat(document.getElementById('d_pct_a').value) || 0;
+        let pN = parseFloat(document.getElementById('d_pct_n').value) || 0;
+
+        // เช็คยอดรวม % เพื่อแสดงสีเตือน
+        let totalShiftPct = pM + pA + pN;
+        let pctBox = document.getElementById('d_total_pct_box');
+        document.getElementById('d_total_pct_val').innerText = totalShiftPct;
         
-        // แสดงผลแบ่งเวร
+        if(totalShiftPct !== 100) {
+            pctBox.classList.add('border-red-500', 'text-red-600');
+            pctBox.classList.remove('border-green-500', 'text-green-600');
+        } else {
+            pctBox.classList.remove('border-red-500', 'text-red-600');
+            pctBox.classList.add('border-green-500', 'text-green-600');
+        }
+
+        // คำนวณจำนวนคนในแต่ละเวร
+        let m = Math.round(finalStaff * (pM / 100));
+        let a = Math.round(finalStaff * (pA / 100));
+        let n = Math.round(finalStaff * (pN / 100));
+        
         document.getElementById('d_shift_m').innerText = m;
         document.getElementById('d_shift_a').innerText = a;
         document.getElementById('d_shift_n').innerText = n;
