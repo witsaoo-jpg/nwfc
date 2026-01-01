@@ -3,502 +3,1311 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Futuristic CI Calculator</title>
+    <title>Nursing Workforce Calculation System (Plus Productivity)</title>
     
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="icon" type="image/png" href="nurse-icon.png">
+    <link rel="apple-touch-icon" href="nurse-icon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --glass-bg: rgba(255, 255, 255, 0.75);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.5);
-            --shadow-soft: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-            --text-main: #2d3748;
-            --text-light: #718096;
-            --accent: #667eea;
-        }
-
-        body {
-            font-family: 'Sarabun', sans-serif;
-            background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
-            background-attachment: fixed;
-            margin: 0;
-            padding: 40px 20px;
-            color: var(--text-main);
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 950px;
-            margin: 0 auto;
-        }
-
-        /* --- Header --- */
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-            position: relative;
-        }
+        body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
+        .fraction { display: inline-block; text-align: center; vertical-align: middle; margin: 0 0.2em; }
+        .fraction > span { display: block; padding-top: 0.1em; }
+        .fraction span.numerator { border-bottom: 2px solid white; }
+        .fraction span.denominator { border-top: 2px solid transparent; }
         
-        .logo-text {
-            font-family: 'Prompt', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 600;
-            background: -webkit-linear-gradient(#4a00e0, #8e2de2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 0;
-            letter-spacing: -1px;
-            text-shadow: 0px 4px 15px rgba(142, 45, 226, 0.15);
-        }
+        .report-fraction span.numerator { border-bottom: 1px solid black; }
         
-        .sub-header {
-            font-family: 'Prompt';
-            color: var(--text-light);
-            background: rgba(255,255,255,0.5);
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            margin-top: 10px;
-            backdrop-filter: blur(4px);
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
         }
 
-        /* --- Glass Card Style --- */
-        .glass-panel {
-            background: var(--glass-bg);
-            box-shadow: var(--shadow-soft);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 24px;
-            border: var(--glass-border);
-            padding: 40px;
-            margin-bottom: 30px;
-            transition: transform 0.3s ease;
-        }
-
-        .section-title {
-            font-family: 'Prompt';
-            font-size: 1.2rem;
-            color: var(--accent);
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .section-title i { font-size: 1.4rem; }
-
-        /* --- Inputs --- */
-        .input-group { margin-bottom: 20px; }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #4a5568;
-            font-size: 0.9rem;
-        }
-        input {
-            width: 100%;
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            font-family: 'Sarabun';
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-            box-sizing: border-box;
-        }
-        input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
-            background: white;
-        }
-
-        /* --- Grid Layouts --- */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
-
-        /* --- Co-Researcher Tags --- */
-        .tag-area {
-            display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
-        }
-        .tag {
-            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
-            color: #4a5568; padding: 5px 12px; border-radius: 20px;
-            font-size: 0.85rem; display: flex; align-items: center; gap: 6px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .tag i { cursor: pointer; color: #e53e3e; }
-
-        /* --- Result Box (Highlight) --- */
-        .result-wrapper {
-            background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%);
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.8);
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
-            margin-top: 20px;
-            display: none;
-            animation: slideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-
-        .ci-value {
-            font-family: 'Prompt';
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 10px 0;
-        }
-
-        /* --- Buttons --- */
-        .btn-group { display: flex; gap: 15px; margin-top: 30px; }
-        .btn {
-            flex: 1;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            font-family: 'Prompt';
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        
-        .btn-primary { background: var(--primary-gradient); color: white; }
-        .btn-success { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); color: #0f5132; }
-        .btn-ghost { background: transparent; border: 2px solid #cbd5e0; color: #718096; }
-
-        /* --- Table --- */
-        .modern-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; margin-top: -10px; }
-        .modern-table th {
-            text-align: left; padding: 10px 20px;
-            color: #718096; font-weight: 600; font-size: 0.9rem;
-        }
-        .modern-table td {
-            background: rgba(255,255,255,0.6);
-            padding: 15px 20px;
-            backdrop-filter: blur(5px);
-        }
-        .modern-table tr td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
-        .modern-table tr td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
-        .modern-table tr:hover td { background: white; transform: scale(1.01); transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-
-        /* --- Knowledge Section --- */
-        .knowledge-box { font-size: 0.95rem; line-height: 1.8; color: #4a5568; }
-        .formula { background: rgba(255,255,255,0.5); padding: 15px; border-radius: 12px; text-align: center; margin: 20px 0; border: 1px dashed #cbd5e0; }
-        .quote { border-left: 4px solid #667eea; padding-left: 15px; margin: 15px 0; font-style: italic; color: #555; background: rgba(102, 126, 234, 0.05); padding: 15px; border-radius: 0 8px 8px 0; }
-
-        /* Print Mode */
-        @media print {
-            body { background: white; padding: 0; }
-            .no-print { display: none !important; }
-            .glass-panel { box-shadow: none; border: none; padding: 0; margin-bottom: 20px; backdrop-filter: none; background: white; }
-            .btn-group { display: none; }
-        }
-
-        @media (max-width: 768px) {
-            .grid-2, .grid-3 { grid-template-columns: 1fr; }
-            .btn-group { flex-direction: column; }
-        }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .gap-alert { animation: pulse-red 2s infinite; }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-6 pb-20">
 
-<div class="container">
-    <header>
-        <h1 class="logo-text">Research CI Calc</h1>
-        <div class="sub-header">Professional Tool for Nursing Research</div>
-    </header>
+    <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden relative">
+        
+        <button id="installBtn" class="hidden absolute top-4 right-20 bg-white text-blue-600 border border-blue-600 px-3 py-1 rounded-full text-xs font-bold shadow-md hover:bg-blue-50 z-10 flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            ติดตั้งแอป
+        </button>
 
-    <div class="glass-panel no-print">
-        <input type="hidden" id="editId">
-        
-        <div class="section-title"><i class="ph ph-user-circle"></i> ข้อมูลโครงการวิจัย</div>
-        
-        <div class="grid-2">
-            <div class="input-group">
-                <label>ชื่อผู้วิจัยหลัก</label>
-                <input type="text" id="piName" placeholder="ระบุชื่อของคุณ...">
+         <div class="bg-blue-600 p-6 text-white flex items-center gap-4">
+            <div class="flex-shrink-0 bg-white p-1 rounded-full shadow-lg">
+                <img src="nurse-icon.png" alt="Logo" class="w-16 h-16 rounded-full object-cover shadow-sm">
             </div>
-            <div class="input-group">
-                <label>ชื่อเรื่องวิจัย</label>
-                <input type="text" id="titleName" placeholder="ระบุชื่อเรื่อง...">
+            <div>
+                <h1 class="text-2xl font-bold leading-tight">🏥 โปรแกรมคำนวณ<br>อัตรากำลังพยาบาล</h1>
+                <p class="text-blue-100 text-sm mt-1">Nursing Workforce Calculation System</p>
             </div>
         </div>
 
-        <div class="input-group">
-            <label>ผู้ร่วมวิจัย (พิมพ์ชื่อแล้วกด Enter)</label>
-            <div style="display:flex; gap:10px;">
-                <input type="text" id="coInput" onkeypress="handleCoKey(event)" placeholder="เพิ่มชื่อผู้ร่วมวิจัย...">
-                <button type="button" onclick="addCoResearcher()" style="width:50px; border-radius:10px; border:none; background:#edf2f7; cursor:pointer;"><i class="ph ph-plus-bold"></i></button>
+        <div class="p-6 space-y-6">
+
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-300 shadow-sm relative">
+                <div class="absolute top-0 right-0 -mt-2 -mr-2 w-4 h-4 bg-red-500 rounded-full animate-ping hidden" id="saveIndicator"></div>
+                <h3 class="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider border-b border-gray-200 pb-2">
+                    จัดการข้อมูลหน่วยงาน (Unit Management)
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+                    <div class="md:col-span-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">รหัสหน่วยงาน (Code)</label>
+                        <div class="flex shadow-sm">
+                            <input type="text" id="unitCode" placeholder="เช่น W01" onchange="autoLoad()" class="w-full p-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500 text-blue-800 font-bold">
+                            <button onclick="loadUnit()" class="bg-blue-500 text-white px-3 rounded-r-md hover:bg-blue-600 transition" title="ค้นหา/โหลดข้อมูล">
+                                🔍
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-gray-400 mt-1 pl-1">*ใช้รหัสนี้เพื่อเรียกดูข้อมูลเก่า</p>
+                    </div>
+                    <div class="md:col-span-8">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อหน่วยงาน (Unit Name)</label>
+                        <input type="text" id="unitName" placeholder="ระบุชื่อหอผู้ป่วย..." class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap gap-2 pt-2 border-t border-gray-200 mt-4">
+                    <button onclick="saveUnit()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow flex items-center transition text-sm font-semibold">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                        บันทึก (Save)
+                    </button>
+                    <button onclick="deleteUnit()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow flex items-center transition text-sm">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        ลบ (Delete)
+                    </button>
+                    <button onclick="clearForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded shadow flex items-center transition text-sm">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        ล้างค่า (New)
+                    </button>
+                    <div class="flex-grow"></div>
+                    
+                    <button onclick="exportToExcel()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded shadow flex items-center transition text-sm font-semibold">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Export Excel
+                    </button>
+
+                    <button onclick="generatePDF()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded shadow flex items-center transition text-sm font-semibold">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        พิมพ์ PDF
+                    </button>
+                </div>
             </div>
-            <div class="tag-area" id="coContainer"></div>
-        </div>
-
-        <div style="height:1px; background:rgba(0,0,0,0.05); margin: 30px 0;"></div>
-
-        <div class="section-title"><i class="ph ph-sliders-horizontal"></i> ข้อมูลทางสถิติ</div>
-        
-        <div class="grid-2">
-            <div style="background:rgba(255,255,255,0.4); padding:20px; border-radius:16px;">
-                <strong style="color:var(--accent); display:block; margin-bottom:15px;">🧪 กลุ่มทดลอง (Experimental)</strong>
-                <div class="grid-3">
-                    <div><label>Mean</label><input type="number" step="any" id="m1" value="0"></div>
-                    <div><label>SD</label><input type="number" step="any" id="sd1" value="0"></div>
-                    <div><label>n</label><input type="number" id="n1" value="0"></div>
+            
+            <div class="flex justify-center -mb-2">
+                <div class="bg-gray-200 p-1 rounded-lg flex relative shadow-inner">
+                    <button onclick="switchMode('annual')" id="btnAnnual" class="px-6 py-2 rounded-md text-sm font-bold transition-all duration-300 shadow bg-white text-blue-600 w-40">
+                        📅 แผนรายปี (FTE)
+                    </button>
+                    <button onclick="switchMode('daily')" id="btnDaily" class="px-6 py-2 rounded-md text-sm font-bold transition-all duration-300 text-gray-500 hover:text-gray-700 w-40">
+                        ☀️ จัดเวรรายวัน (Daily)
+                    </button>
                 </div>
             </div>
 
-            <div style="background:rgba(255,255,255,0.4); padding:20px; border-radius:16px;">
-                <strong style="color:#718096; display:block; margin-bottom:15px;">🛡️ กลุ่มควบคุม (Control)</strong>
-                <div class="grid-3">
-                    <div><label>Mean</label><input type="number" step="any" id="m2" value="0"></div>
-                    <div><label>SD</label><input type="number" step="any" id="sd2" value="0"></div>
-                    <div><label>n</label><input type="number" id="n2" value="0"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทหอผู้ป่วย (Ward Type)</label>
+                    <select id="wardType" onchange="updatePreset()" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <option value="custom">-- กำหนดเอง --</option>
+                        <option value="ward_gen">หอผู้ป่วยสามัญ (General Ward)</option>
+                        <option value="icu">หอผู้ป่วยวิกฤต (ICU)</option>
+                        <option value="opd">ผู้ป่วยนอก (OPD)</option>
+                    </select>
+                    <p class="text-[10px] text-gray-400 mt-1 pl-1">เลือกเพื่อดึงค่า NHPPD มาตรฐาน</p>
                 </div>
+                <div>
+                    <label for="adc" class="block text-sm font-medium text-gray-700 mb-1">ขั้นตอนที่1 จำนวนผู้ป่วยเฉลี่ย (ADC)</label>
+                    <input type="number" id="adc" value="0" oninput="calcNHPPDTable(); calculate();" class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <p class="text-[10px] text-gray-400 mt-1 pl-1" id="adcSubtext">Average Daily Census (คน/วัน)</p>
+                </div>
+            </div>
+
+            <div class="bg-orange-50 p-5 rounded-lg border border-orange-200">
+                <h3 class="text-sm font-bold text-orange-800 mb-4 uppercase tracking-wider border-b pb-2 border-orange-200 flex justify-between items-center">
+                    <span>ขั้นตอนที่2 คำนวณค่า NHPPD ตามประเภทผู้ป่วย(Warstler, 1970) </span>
+                    <button onclick="resetNHPPDTable()" class="text-xs text-orange-400 hover:text-orange-600 font-normal underline">รีค่าเริ่มต้น</button>
+                </h3>
+                
+                <div class="overflow-x-auto mb-4">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-orange-100 text-orange-900 border-b border-orange-200">
+                                <th class="py-2 px-2 text-left font-semibold">ประเภท (Type)</th>
+                                <th class="py-2 px-2 text-center w-20 font-semibold">จำนวนคน</th>
+                                <th class="py-2 px-2 text-center w-20 font-semibold">ชม./คน</th>
+                                <th class="py-2 px-2 text-right w-24 font-semibold">รวม (ชม.)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-orange-100">
+                            <tr>
+                                <td class="py-2 px-2 text-gray-700">5. Intensive Care</td>
+                                <td class="px-1"><input type="number" id="pt_5" value="0" min="0" oninput="calcNHPPDTable()" class="w-full p-1 border border-orange-200 rounded text-center focus:ring-1 focus:ring-orange-500"></td>
+                                <td class="px-1"><input type="number" id="hr_5" value="12.0" readonly tabindex="-1" class="w-full p-1 border border-orange-200 rounded text-center bg-gray-100 text-gray-600 cursor-not-allowed"></td>
+                                <td class="py-2 px-2 text-right font-mono text-orange-600" id="sum_hr_5">0.0</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-2 text-gray-700">4. Modified Intensive</td>
+                                <td class="px-1"><input type="number" id="pt_4" value="0" min="0" oninput="calcNHPPDTable()" class="w-full p-1 border border-orange-200 rounded text-center focus:ring-1 focus:ring-orange-500"></td>
+                                <td class="px-1"><input type="number" id="hr_4" value="7.5" readonly tabindex="-1" class="w-full p-1 border border-orange-200 rounded text-center bg-gray-100 text-gray-600 cursor-not-allowed"></td>
+                                <td class="py-2 px-2 text-right font-mono text-orange-600" id="sum_hr_4">0.0</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-2 text-gray-700">3. Intermediate Care</td>
+                                <td class="px-1"><input type="number" id="pt_3" value="0" min="0" oninput="calcNHPPDTable()" class="w-full p-1 border border-orange-200 rounded text-center focus:ring-1 focus:ring-orange-500"></td>
+                                <td class="px-1"><input type="number" id="hr_3" value="5.5" readonly tabindex="-1" class="w-full p-1 border border-orange-200 rounded text-center bg-gray-100 text-gray-600 cursor-not-allowed"></td>
+                                <td class="py-2 px-2 text-right font-mono text-orange-600" id="sum_hr_3">0.0</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-2 text-gray-700">2. Minimal Care</td>
+                                <td class="px-1"><input type="number" id="pt_2" value="0" min="0" oninput="calcNHPPDTable()" class="w-full p-1 border border-orange-200 rounded text-center focus:ring-1 focus:ring-orange-500"></td>
+                                <td class="px-1"><input type="number" id="hr_2" value="3.5" readonly tabindex="-1" class="w-full p-1 border border-orange-200 rounded text-center bg-gray-100 text-gray-600 cursor-not-allowed"></td>
+                                <td class="py-2 px-2 text-right font-mono text-orange-600" id="sum_hr_2">0.0</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-2 text-gray-700">1. Self Care</td>
+                                <td class="px-1"><input type="number" id="pt_1" value="0" min="0" oninput="calcNHPPDTable()" class="w-full p-1 border border-orange-200 rounded text-center focus:ring-1 focus:ring-orange-500"></td>
+                                <td class="px-1"><input type="number" id="hr_1" value="1.5" readonly tabindex="-1" class="w-full p-1 border border-orange-200 rounded text-center bg-gray-100 text-gray-600 cursor-not-allowed"></td>
+                                <td class="py-2 px-2 text-right font-mono text-orange-600" id="sum_hr_1">0.0</td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="bg-orange-100 font-bold text-orange-900">
+                            <tr>
+                                <td class="py-2 px-2 text-right">รวม (Total)</td>
+                                <td class="py-2 px-2 text-center" id="grand_total_pt">0</td>
+                                <td class="py-2 px-2 text-center">-</td>
+                                <td class="py-2 px-2 text-right" id="grand_total_hr">0.0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="flex items-center justify-between bg-white p-3 rounded border border-orange-200 shadow-sm">
+                    <div class="flex items-center gap-3 w-full">
+                        <div>
+                            <p class="text-[10px] text-gray-400 uppercase tracking-wide">Average NHPPD</p>
+                            <p class="text-3xl font-bold text-orange-600" id="calc_nhppd_result">0.00</p>
+                            <p class="text-[10px] text-gray-400 mt-1 font-mono" id="nhppd_formula_text">
+                                ( Workload ÷ ADC )
+                            </p>
+                        </div>
+                        <div class="hidden md:block h-12 w-px bg-gray-200 mx-2"></div>
+                        
+                        <div class="text-xs text-green-600 flex items-center bg-green-50 px-3 py-1.5 rounded-full hidden" id="sync_badge">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span>ส่งค่าไปที่ Parameters แล้ว</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 transition-colors duration-300" id="paramSection">
+                <h3 class="text-sm font-bold text-gray-600 mb-4 uppercase tracking-wider border-b pb-2 border-gray-200">
+                    ขั้นตอนที่3 หา FTE โดยใส่ค่าตัวแปรการคำนวณ (Parameters)
+                </h3>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-6 mb-6">
+                    <div class="relative">
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">NHPPD (ชม.)</label>
+                        <input type="number" step="0.1" id="nhppd" value="0" oninput="calculate()" class="w-full p-1.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500 transition-all duration-300">
+                        <div id="nhppd_highlight" class="absolute inset-0 border-2 border-orange-400 rounded opacity-0 pointer-events-none transition-opacity duration-500"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">ค่าคงที่ (Constant)</label>
+                        <input type="number" step="0.1" id="constant" value="1.4" oninput="calculate()" class="w-full p-1.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Benefit FTE</label>
+                        <input type="number" step="0.01" id="benefit" value="1.14" oninput="calculate()" class="w-full p-1.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">ชม.ทำงาน/วัน</label>
+                        <input type="number" id="workHours" value="7" oninput="calculate()" class="w-full p-1.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div class="bg-white p-3 rounded border border-blue-100 shadow-sm text-center">
+                    <p class="text-[10px] text-gray-400 uppercase font-bold mb-1 tracking-wider">สูตรการคำนวณ FTE (1 FTE = 2,368 ชม.)</p>
+                    <div class="text-sm text-gray-700 font-medium overflow-x-auto whitespace-nowrap">
+                        <span class="text-blue-600 font-bold">FTE</span> = 
+                        ( <span class="text-gray-900">ADC</span> × <span class="text-gray-900">NHPPD</span> × <span class="text-gray-900">Constant</span> × <span class="text-gray-900">Benefit</span> ) 
+                        ÷ <span class="text-gray-900">ชม.ทำงาน</span>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-gray-100">
+
+            <div class="text-center">
+                <p class="text-gray-500 mb-1 text-sm" id="step4Label">ขั้นตอนที่4 อัตรากำลัง FTE ที่ต้องการ (100%)</p>
+                <h2 class="text-5xl font-bold text-gray-700" id="totalStaff">0.00</h2>
+                <p class="text-gray-400 text-xs mt-1 uppercase tracking-widest">Full Time Equivalent</p>
+            </div>
+
+            <div class="bg-gray-800 text-white rounded-xl p-6 shadow-inner relative overflow-hidden">
+                <div class="absolute top-0 right-0 -mt-2 -mr-2 w-24 h-24 bg-white opacity-5 rounded-full blur-xl"></div>
+                
+                <h3 class="text-center text-yellow-400 text-sm font-semibold mb-4 uppercase tracking-widest">
+                    คำนวณจำนวนคน (Headcount)
+                </h3>
+
+                <div class="flex justify-center mb-6">
+                    <div class="bg-gray-700 p-2 rounded-lg border border-gray-600 flex items-center space-x-2">
+                        <label class="text-xs text-gray-300">เลือกสัดส่วน (Productivity):</label>
+                        <select id="staffPercentage" onchange="calculate()" class="bg-gray-900 text-white text-sm border border-gray-500 rounded px-2 py-1 focus:ring-1 focus:ring-yellow-400 outline-none">
+                            <option value="1">100% (เต็มกรอบ)</option>
+                            <option value="0.9">90%</option>
+                            <option value="0.8">80%</option>
+                            <option value="0.75">75%</option>
+                            <option value="0.7" selected>70% (ขั้นต่ำ)</option>
+                            <option value="0.6">60%</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center justify-center mb-4">
+                    <div class="text-xl md:text-2xl font-serif italic flex items-center flex-wrap justify-center">
+                        <span class="mr-3">(ขั้นตอนที่5)หาจำนวนคน = </span>
+                        <div class="fraction">
+                            <span class="numerator px-2">FTE × 2,368</span>
+                            <span class="denominator">2,080</span>
+                        </div>
+                        <span class="ml-2 text-yellow-300 text-lg"> × <span id="displayPct">70</span>%</span>
+                    </div>
+                </div>
+
+                <div class="text-center mt-2">
+                    <div class="inline-block bg-gray-900 px-6 py-3 rounded-lg border border-green-500 shadow-lg shadow-green-900/20">
+                        <span class="text-5xl font-bold text-green-400" id="headCountResult">0.00</span>
+                        <span class="text-lg text-gray-300 ml-2">คน</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-3" id="formulaDetail">
+                        (คำนวณจาก FTE x สัดส่วนที่เลือก)
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-4 shadow-md border-2 border-blue-100 mt-2 flex flex-col items-center">
+                <h3 class="text-center text-blue-800 text-sm font-bold mb-3 uppercase border-b pb-2 w-full">
+                    เปรียบเทียบอัตรากำลัง (Gap & Productivity Analysis)
+                </h3>
+                <div class="w-full flex flex-col md:flex-row gap-4 items-center justify-center">
+                    <div class="flex-1 w-full">
+                        <label class="block text-xs text-gray-600 mb-1 text-center" id="currentStaffLabel">จำนวนคนที่มีอยู่จริง (Current Staff)</label>
+                        <input type="number" id="currentStaff" placeholder="ระบุจำนวน" oninput="calculate()" class="w-full text-center text-2xl font-bold p-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-0">
+                    </div>
+                    <div class="flex-none text-gray-400">vs</div>
+                    <div class="flex-1 w-full text-center p-2 rounded-lg bg-gray-100 transition-all duration-300" id="gapBox">
+                        <p class="text-xs text-gray-500 mb-1">ผลต่าง (Gap)</p>
+                        <div class="text-3xl font-bold text-gray-400" id="gapResult">-</div>
+                        <p class="text-[10px] mt-1" id="gapText">รอข้อมูล</p>
+                    </div>
+
+                    <div class="flex-none text-gray-400">-></div>
+                    <div class="flex-1 w-full text-center p-2 rounded-lg bg-gray-50 border border-gray-200 transition-all duration-300" id="prodBox">
+                        <p class="text-xs text-gray-500 mb-1">Productivity จริง</p>
+                        <div class="text-3xl font-bold text-gray-400" id="realProdResult">- %</div>
+                        <p class="text-[10px] mt-1" id="realProdText">ความหนักของงาน</p>
+                    </div>
+                    </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm mt-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-bold text-gray-700 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                        แนวโน้มภาระงานย้อนหลัง (Workforce Trends)
+                    </h3>
+                    <button onclick="clearHistory()" class="text-xs text-red-400 hover:text-red-600 underline">ล้างประวัติกราฟ</button>
+                </div>
+                <div class="h-64 w-full">
+                    <canvas id="trendChart"></canvas>
+                </div>
+                <p class="text-xs text-gray-400 mt-2 text-center">*กราฟจะอัปเดตเมื่อกดปุ่ม "บันทึก"</p>
+            </div>
+
+            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 mt-6">
+                <div class="flex justify-between items-end mb-3">
+                    <h3 class="text-blue-800 font-semibold">ขั้นตอนที่6 แนะนำการจัดเวร (Daily Shift Plan)</h3>
+                    <div class="text-[10px] text-blue-500 bg-white px-2 py-1 rounded border border-blue-100">
+                        รวม: <span id="totalShiftPct" class="font-bold">100</span>%
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="bg-white p-3 rounded shadow-sm border border-blue-100 hover:shadow-md transition">
+                        <label class="text-xs text-gray-500 block mb-1">เวรเช้า (%)</label>
+                        <input type="number" id="pctMorning" value="40" oninput="calculate()" class="w-full text-center border-b-2 border-blue-200 focus:border-blue-500 outline-none font-bold text-gray-700 mb-2">
+                        <p class="text-2xl font-bold text-blue-600" id="shiftMorning">0</p>
+                        <p class="text-[10px] text-gray-400">คน</p>
+                    </div>
+                    <div class="bg-white p-3 rounded shadow-sm border border-blue-100 hover:shadow-md transition">
+                        <label class="text-xs text-gray-500 block mb-1">เวรบ่าย (%)</label>
+                        <input type="number" id="pctAfternoon" value="30" oninput="calculate()" class="w-full text-center border-b-2 border-orange-200 focus:border-orange-500 outline-none font-bold text-gray-700 mb-2">
+                        <p class="text-2xl font-bold text-orange-500" id="shiftAfternoon">0</p>
+                        <p class="text-[10px] text-gray-400">คน</p>
+                    </div>
+                    <div class="bg-white p-3 rounded shadow-sm border border-blue-100 hover:shadow-md transition">
+                        <label class="text-xs text-gray-500 block mb-1">เวรดึก (%)</label>
+                        <input type="number" id="pctNight" value="30" oninput="calculate()" class="w-full text-center border-b-2 border-indigo-200 focus:border-indigo-500 outline-none font-bold text-gray-700 mb-2">
+                        <p class="text-2xl font-bold text-indigo-600" id="shiftNight">0</p>
+                        <p class="text-[10px] text-gray-400">คน</p>
+                    </div>
+                </div>
+                <p class="text-xs text-blue-400 mt-3 text-center">*หมายเหตุ: คำนวณจากจำนวนคนขึ้นปฏิบัติงานจริง (Daily Staff) โดยอิงตาม % ที่กำหนด</p>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm mt-8">
+                <h3 class="text-gray-700 font-bold text-base mb-4 border-b pb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    สูตรและที่มาของตัวแปร (Definitions & Formulas)
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">ADC (จำนวนผู้ป่วยเฉลี่ย)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= จำนวนวันนอนของผู้ป่วยทั้งหมดใน 1 ปี ÷ 365 วัน</div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">NHPPD (ชั่วโมงการพยาบาล)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= จำนวนชั่วโมงความต้องการ การพยาบาลของผู้ป่วยรวมกันทุกคน ÷ จำนวนผู้ป่วยเฉลี่ยต่อวัน(ADC)</div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Constant (ค่าคงที่)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= 1.4 (7วัน/5วัน=1.4 คือ อัตรากำลังทดแทนในวันหยุด)</div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Benefit FTE (ค่าชดเชย)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= (จำนวนชม.ของจนท.1คนต่อปี + non P.H.วันลาวันหยุดนักขัตฤกษ์) ÷ จำนวนชม.ของจนท.1คนต่อปี คือ (2080+288)/2080=1.14(ปกติค่าเฉลี่ยอยู่ที่ 1.14 - 1.17)</div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">ชม.ทำงาน/วัน</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= เวลาขึ้นเวร (8 ชม.) - เวลาพัก (1 ชม.) = 7 ชม.</div>
+                    </div>
+                        
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm mt-2 border-t pt-2 border-gray-100">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">FTE (Full-Time Equivalent)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">
+                            = ค่าเทียบเท่าพนักงานเต็มเวลา (8 ชม. x 5 วัน x 52 สัปดาห์ = 2,080 ชม.) + วันลาตามสิทธิ์ (288 ชม.) <br>
+                            <span class="font-bold text-gray-800">ดังนั้น 1 FTE = 2,368 ชม.</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Non-Productive Hours (ชม.ไม่ได้งาน)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= วันลาต่างๆ ตามสิทธิ์รวมประมาณ 36 วัน x 8 ชม. = 288 ชม.</div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Productive Hours (ชม.ที่ได้งาน)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">= ชม.ทำงานทั้งปี - ชม.ที่ไม่ได้งาน (2,080 - 288 = 1,792 ชม.)</div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm mt-2 border-t pt-2 border-gray-100">
+                        <div class="sm:w-1/3 font-semibold text-blue-800 bg-blue-50 px-2 py-1 rounded self-start">Productivity (ผลิตภาพ)</div>
+                        <div class="sm:w-2/3 text-gray-600 pt-1">
+                            = (จำนวนชั่วโมงความต้องการการพยาบาลของผู้ป่วย ÷ จำนวนชั่วโมงที่พยาบาลทำงาน) × 100 <br>
+                            <span class="text-xs text-gray-400 italic">(อ้างอิง: กฤษดา แสวงดี, 2545 : 31)</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-2 text-sm bg-yellow-50 p-2 rounded border border-yellow-200 mt-2">
+                        <div class="sm:w-1/3 font-semibold text-yellow-800 bg-yellow-100 px-2 py-1 rounded self-start">Staffing % (70%)</div>
+                        <div class="sm:w-2/3 text-gray-700 pt-1">
+                            = <span class="font-bold">เกณฑ์ขั้นต่ำ (Minimum Requirement)</span> ที่ต้องมีเพื่อให้หอผู้ป่วยเปิดดำเนินการได้โดยปลอดภัย (Patient Safety) 
+                            ในกรณีที่มีข้อจำกัดด้านบุคลากร ไม่สามารถจัดหาอัตรากำลังได้เต็ม 100% ตาม FTE (Full Time Equivalent)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-orange-50 border border-orange-100 rounded-lg p-5">
+                <h3 class="text-orange-800 font-bold text-sm mb-3">
+                      เกณฑ์ NHPPD ตามการจำแนกประเภทผู้ป่วย (อ้างอิง: Warstler, 1970)
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-md overflow-hidden shadow-sm text-xs md:text-sm">
+                        <thead class="bg-orange-100 text-orange-900">
+                            <tr>
+                                <th class="py-2 px-3 text-left">ประเภทผู้ป่วย (Classification)</th>
+                                <th class="py-2 px-3 text-center">NHPPD (ชม.)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr><td class="py-2 px-3">5. Intensive Care</td><td class="py-2 px-3 text-center text-blue-600 font-bold">12.0</td></tr>
+                            <tr><td class="py-2 px-3">4. Modified Intensive Care</td><td class="py-2 px-3 text-center text-blue-600 font-bold">7.5</td></tr>
+                            <tr><td class="py-2 px-3">3. Intermediate Care</td><td class="py-2 px-3 text-center text-blue-600 font-bold">5.5</td></tr>
+                            <tr><td class="py-2 px-3">2. Minimal Care</td><td class="py-2 px-3 text-center text-blue-600 font-bold">3.5</td></tr>
+                            <tr><td class="py-2 px-3">1. Self Care</td><td class="py-2 px-3 text-center text-blue-600 font-bold">1.5</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="text-center mt-8 mb-8 text-gray-500 space-y-4">
+        <div class="text-sm font-medium opacity-75">
+            ผู้ตรวจสอบโปรแกรม : อาจารย์อิชยา สุวรรณกุล <br> พัฒนาโดย พว.วิษณุกรณ์ โอยา(รพ.ชลบุรี)
+        </div>
+        <div class="flex justify-center items-center opacity-90">
+             <a href="https://www.freecounterstat.com" title="free hit counters">
+                <img src="https://counter1.optistats.ovh/private/freecounterstat.php?c=dfxnuny3jue2bh5nbg7b8nz8mg4n1hhp" border="0" title="free hit counters" alt="free hit counters">
+            </a>
+        </div>
+    </div>
+
+    <div id="reportContent" class="hidden bg-white p-8 max-w-[210mm] mx-auto text-black">
+        <div class="text-center mb-6 border-b-2 border-black pb-4">
+            <h1 class="text-2xl font-bold mb-2">รายงานการคำนวณอัตรากำลังพยาบาล</h1>
+            <h2 class="text-lg">(Nursing Workforce Calculation Report)</h2>
+            <p class="text-sm mt-2 text-gray-600">วันที่พิมพ์: <span id="rptDate"></span></p>
+        </div>
+
+        <div class="flex justify-between mb-6 text-sm">
+            <div>
+                <p><strong>หน่วยงาน:</strong> <span id="rptUnitName">-</span></p>
+                <p><strong>รหัสหน่วยงาน:</strong> <span id="rptUnitCode">-</span></p>
+            </div>
+            <div class="text-right">
+                <p><strong>ประเภทหอผู้ป่วย:</strong> <span id="rptWardType">-</span></p>
             </div>
         </div>
 
-        <div id="resultBox" class="result-wrapper">
-            <div style="font-size:0.9rem; color:#718096; letter-spacing:1px; text-transform:uppercase;">95% Confidence Interval</div>
-            <div class="ci-value" id="ciText">--</div>
-            <div id="interpretText" style="font-weight:500;"></div>
+        <div class="mb-6">
+            <h3 class="font-bold border-b border-gray-400 mb-2">1. ข้อมูลพื้นฐานและตัวแปร (Parameters)</h3>
+            <div class="grid grid-cols-4 gap-4 text-sm bg-gray-50 p-3 rounded border border-gray-200">
+                <div><span class="block text-gray-500 text-xs">ADC/Census</span><span class="font-bold text-lg" id="rptADC">0</span></div>
+                <div><span class="block text-gray-500 text-xs">NHPPD</span><span class="font-bold text-lg" id="rptNHPPD">0</span></div>
+                <div><span class="block text-gray-500 text-xs">Constant</span><span class="font-bold text-lg" id="rptConstant">1.4</span></div>
+                <div><span class="block text-gray-500 text-xs">Productivity</span><span class="font-bold text-lg" id="rptProd">70%</span></div>
+            </div>
         </div>
 
-        <div class="btn-group">
-            <button class="btn btn-ghost" onclick="resetForm()"><i class="ph ph-eraser"></i> ล้างค่า</button>
-            <button class="btn btn-primary" onclick="calculatePreview()"><i class="ph ph-calculator"></i> คำนวณผลลัพธ์</button>
-            <button class="btn btn-success" onclick="saveData()"><i class="ph ph-floppy-disk"></i> บันทึกข้อมูล</button>
+        <div class="mb-6">
+            <h3 class="font-bold border-b border-gray-400 mb-2">2. ผลลัพธ์การคำนวณ (Results)</h3>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="border border-gray-300 p-4 rounded text-center">
+                    <p class="text-gray-500 text-sm mb-1">ความต้องการ (Full Requirement)</p>
+                    <p class="text-3xl font-bold" id="rptFTE">0.00</p>
+                </div>
+                <div class="border border-gray-300 p-4 rounded text-center bg-gray-50">
+                    <p class="text-gray-500 text-sm mb-1">จำนวนคน (Headcount) ที่ <span id="rptPctDisplay">70%</span></p>
+                    <p class="text-4xl font-bold text-black" id="rptHeadcount">0.00</p>
+                    <p class="text-xs text-gray-500 mt-1">คน</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-6">
+             <h3 class="font-bold border-b border-gray-400 mb-2">3. การเปรียบเทียบ (Gap Analysis)</h3>
+             <div class="border border-gray-300 p-4 rounded bg-gray-50 flex justify-between">
+                 <div>
+                     <p>จำนวนคนที่มีอยู่จริง: <strong id="rptCurrent">0</strong></p>
+                     <p>จำนวนคนที่ต้องการ: <strong id="rptRequired">0</strong></p>
+                 </div>
+                 <div class="text-right">
+                     <p>ผลต่าง (Gap):</p>
+                     <p class="text-2xl font-bold" id="rptGap">-</p>
+                 </div>
+             </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-10 mt-12 pt-8">
+            <div class="text-center">
+                <div class="border-b border-black w-3/4 mx-auto mb-2"></div>
+                <p class="text-sm">ผู้จัดทำ/คำนวณ</p>
+            </div>
+            <div class="text-center">
+                <div class="border-b border-black w-3/4 mx-auto mb-2"></div>
+                <p class="text-sm">หัวหน้าหอผู้ป่วย/ผู้ตรวจสอบ</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="dailyModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform scale-100 transition-transform duration-300">
+            
+            <div class="bg-orange-500 p-4 flex justify-between items-center sticky top-0 z-10">
+                <h3 class="text-white font-bold text-lg flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    คำนวณจัดเวรประจำวัน (Daily Staffing)
+                </h3>
+                <button onclick="closeDailyModal()" class="text-white hover:bg-orange-600 rounded-full p-1 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <div class="bg-orange-50 p-3 rounded-lg border border-orange-100 text-sm text-orange-800">
+                    💡 <strong>โหมดรายวัน:</strong> ข้อมูลในหน้านี้จะแยกอิสระจากหน้าหลัก คุณสามารถปรับเปลี่ยนจำนวนผู้ป่วยได้ตามหน้างานจริงวันนี้
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">ผู้ป่วยวันนี้ (Census)</label>
+                        <input type="number" id="d_census" class="w-full p-2 border border-gray-300 rounded text-center font-bold text-xl text-blue-600" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">ภาระงานรวม (Total Hours)</label>
+                        <input type="number" id="d_total_hours" class="w-full p-2 border border-gray-300 rounded text-center font-bold text-xl text-gray-600 bg-gray-50" readonly>
+                    </div>
+                </div>
+
+                <div class="border rounded-lg overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-100 text-gray-700">
+                            <tr>
+                                <th class="py-2 px-3 text-left">ประเภท</th>
+                                <th class="py-2 px-3 text-center w-24">จำนวนคน</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr>
+                                <td class="p-2">5. Intensive (12.0)</td>
+                                <td class="p-1"><input type="number" id="d_pt_5" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">4. Mod. Intensive (7.5)</td>
+                                <td class="p-1"><input type="number" id="d_pt_4" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">3. Intermediate (5.5)</td>
+                                <td class="p-1"><input type="number" id="d_pt_3" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">2. Minimal (3.5)</td>
+                                <td class="p-1"><input type="number" id="d_pt_2" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">1. Self Care (1.5)</td>
+                                <td class="p-1"><input type="number" id="d_pt_1" oninput="calcDaily()" class="w-full border rounded text-center p-1 font-bold text-orange-600"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex items-center justify-between bg-gray-100 p-3 rounded-lg border border-gray-200">
+                    <label class="text-sm font-bold text-gray-700">เลือกสัดส่วน (Productivity):</label>
+                    <select id="d_staffPercentage" onchange="calcDaily()" class="bg-white border border-gray-300 text-gray-700 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2 w-48 font-bold">
+                        <option value="1">100% (เต็มกรอบ)</option>
+                        <option value="0.95">95%</option>
+                        <option value="0.9">90%</option>
+                        <option value="0.85">85%</option>
+                        <option value="0.8">80%</option>
+                        <option value="0.75">75%</option>
+                        <option value="0.7">70% (ขั้นต่ำ)</option>
+                        <option value="0.6">60%</option>
+                    </select>
+                </div>
+                
+                <div class="bg-gray-800 text-white rounded-xl p-5 text-center relative overflow-hidden shadow-inner">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-blue-500"></div>
+                    <p class="text-gray-400 text-xs uppercase tracking-widest mb-2">ความต้องการพยาบาล (24 ชม.)</p>
+                    
+                    <div class="flex justify-center items-end gap-2">
+                        <span id="d_staff_result" class="text-5xl font-bold text-green-400">0.0</span>
+                        <span class="text-lg text-gray-400 mb-2">คน</span>
+                    </div>
+
+                    <div class="mt-3 pt-3 border-t border-gray-700">
+                        <p class="text-xs text-gray-400 font-mono" id="d_formula_explain">
+                            ( ... )
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-end mb-2 mt-4">
+                    <h4 class="text-sm font-bold text-gray-700">จัดสรรเวร (Shift Distribution)</h4>
+                    <div class="text-xs px-2 py-1 rounded border bg-white" id="d_total_pct_box">
+                        รวม: <span id="d_total_pct_val" class="font-bold">100</span>%
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="bg-blue-50 p-2 rounded border border-blue-200 shadow-sm">
+                        <label class="text-[10px] text-blue-800 font-bold block mb-1">เวรเช้า (%)</label>
+                        <input type="number" id="d_pct_m" oninput="calcDaily()" class="w-full text-center border border-blue-300 rounded text-sm font-bold text-blue-700 mb-2 focus:ring-1 focus:ring-blue-500" placeholder="40">
+                        <p id="d_shift_m" class="text-2xl font-bold text-blue-600">0</p>
+                        <p class="text-[10px] text-gray-400">คน</p>
+                    </div>
+
+                    <div class="bg-orange-50 p-2 rounded border border-orange-200 shadow-sm">
+                        <label class="text-[10px] text-orange-800 font-bold block mb-1">เวรบ่าย (%)</label>
+                        <input type="number" id="d_pct_a" oninput="calcDaily()" class="w-full text-center border border-orange-300 rounded text-sm font-bold text-orange-700 mb-2 focus:ring-1 focus:ring-orange-500" placeholder="30">
+                        <p id="d_shift_a" class="text-2xl font-bold text-orange-600">0</p>
+                        <p class="text-[10px] text-gray-400">คน</p>
+                    </div>
+
+                    <div class="bg-indigo-50 p-2 rounded border border-indigo-200 shadow-sm">
+                        <label class="text-[10px] text-indigo-800 font-bold block mb-1">เวรดึก (%)</label>
+                        <input type="number" id="d_pct_n" oninput="calcDaily()" class="w-full text-center border border-indigo-300 rounded text-sm font-bold text-indigo-700 mb-2 focus:ring-1 focus:ring-indigo-500" placeholder="30">
+                        <p id="d_shift_n" class="text-2xl font-bold text-indigo-600">0</p>
+                        <p class="text-[10px] text-gray-400">คน</p>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="bg-gray-50 p-4 flex justify-end gap-2 border-t">
+                <button onclick="closeDailyModal()" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded text-gray-800 font-bold transition">ปิดหน้าต่าง</button>
+            </div>
         </div>
     </div>
 
-    <div class="glass-panel">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <div class="section-title" style="margin:0;"><i class="ph ph-database"></i> ประวัติการคำนวณ</div>
-            <button onclick="window.print()" class="btn btn-ghost no-print" style="padding:8px 15px; font-size:0.9rem;">
-                <i class="ph ph-printer"></i> Print PDF
-            </button>
-        </div>
-        
-        <div style="overflow-x:auto;">
-            <table class="modern-table">
-                <thead>
-                    <tr>
-                        <th width="30%">โครงการวิจัย</th>
-                        <th width="25%">กลุ่มตัวอย่าง</th>
-                        <th width="25%">ผล 95% CI</th>
-                        <th width="10%">แปลผล</th>
-                        <th width="10%" class="no-print" style="text-align:right;">จัดการ</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="glass-panel knowledge-box">
-        <div class="section-title"><i class="ph ph-graduation-cap"></i> สรุปสูตรและที่มา (Methodology)</div>
-        
-        <p>การวิเคราะห์ความแตกต่างของค่าเฉลี่ย 2 กลุ่มอิสระ (Independent Samples) โดยใช้สถิติ 95% Confidence Interval</p>
-
-        <div style="margin-top:20px;"><strong>1. สูตรคำนวณ Standard Error (SE)</strong></div>
-        <div class="formula">
-            $$ SE_{\bar{X}_1-\bar{X}_2} = \sqrt{ \frac{SD_1^2}{n_1} + \frac{SD_2^2}{n_2} } $$
-        </div>
-        <div class="quote">
-            "ส่วนคลาดเคลื่อนมาตรฐานของผลต่างค่าเฉลี่ย (Standard Error of Mean Difference) คำนวณจากส่วนเบี่ยงเบนมาตรฐานและขนาดตัวอย่างของทั้งสองกลุ่ม ตามสูตร..."
-        </div>
-
-        <div style="margin-top:20px;"><strong>2. ที่มาของค่า Z = 1.96</strong></div>
-        <p>ที่ระดับความเชื่อมั่น 95% ($\alpha = 0.05$) บนการแจกแจงปกติมาตรฐาน พื้นที่ใต้กราฟตรงกลาง 95% จะถูกล้อมรอบด้วยค่า Z-score ที่ $\pm 1.96$</p>
-        
-        <div class="quote">
-            "การคำนวณช่วงความเชื่อมั่นร้อยละ 95 ใช้ค่าคงที่ Z เท่ากับ 1.96 ซึ่งได้จากการแจกแจงปกติมาตรฐาน โดยครอบคลุมพื้นที่ใต้โค้งปกติร้อยละ 95"
-        </div>
-
-        <div style="margin-top:20px;"><strong>3. สูตร 95% CI ฉบับสมบูรณ์</strong></div>
-        <div class="formula">
-            $$ 95\% CI = (\bar{X}_1 - \bar{X}_2) \pm 1.96 \sqrt{ \frac{SD_1^2}{n_1} + \frac{SD_2^2}{n_2} } $$
-        </div>
-    </div>
-
-    <footer style="text-align:center; color:#a0aec0; font-size:0.85rem; margin-top:40px;">
-        Designed by RN. Witsanukorn Oya © 2026 | Future Research Tool
-    </footer>
-</div>
-
-<script>
-    // --- Variables ---
-    let researchData = JSON.parse(localStorage.getItem('researchData')) || [];
-    let currentCoResearchers = [];
-
-    window.onload = function() { renderTable(); };
-
-    // --- Co-Researchers Logic ---
-    function handleCoKey(e) { if(e.key === 'Enter') { e.preventDefault(); addCoResearcher(); } }
-    function addCoResearcher() {
-        const input = document.getElementById('coInput');
-        const name = input.value.trim();
-        if(name && !currentCoResearchers.includes(name)) {
-            currentCoResearchers.push(name); renderTags(); input.value = '';
-        }
-    }
-    function removeCoResearcher(index) {
-        currentCoResearchers.splice(index, 1); renderTags();
-    }
-    function renderTags() {
-        const container = document.getElementById('coContainer');
-        container.innerHTML = '';
-        currentCoResearchers.forEach((name, idx) => {
-            const tag = document.createElement('div');
-            tag.className = 'tag';
-            tag.innerHTML = `${name} <i class="ph ph-x-circle" onclick="removeCoResearcher(${idx})"></i>`;
-            container.appendChild(tag);
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker Registered!', reg))
+            .catch(err => console.log('Service Worker registration failed: ', err));
         });
-    }
+      }
 
-    // --- Calculation ---
-    function calculateStats() {
-        const m1 = parseFloat(document.getElementById('m1').value);
-        const sd1 = parseFloat(document.getElementById('sd1').value);
-        const n1 = parseFloat(document.getElementById('n1').value);
-        const m2 = parseFloat(document.getElementById('m2').value);
-        const sd2 = parseFloat(document.getElementById('sd2').value);
-        const n2 = parseFloat(document.getElementById('n2').value);
+      let deferredPrompt;
+      const installBtn = document.getElementById('installBtn');
 
-        if(n1 <=0 || n2 <=0) return null;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.classList.remove('hidden');
 
-        const diff = m1 - m2;
-        const se = Math.sqrt((Math.pow(sd1, 2)/n1) + (Math.pow(sd2, 2)/n2));
-        const me = 1.96 * se;
-        const lower = diff - me;
-        const upper = diff + me;
-        const isSig = (lower * upper > 0);
+        installBtn.addEventListener('click', (e) => {
+          installBtn.classList.add('hidden');
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('User accepted the A2HS prompt');
+            } else {
+              console.log('User dismissed the A2HS prompt');
+            }
+            deferredPrompt = null;
+          });
+        });
+      });
+    </script>
 
-        return { diff, lower, upper, isSig };
-    }
+    <script>
+        // --- Global Variables ---
+        let myChart = null;
+        let currentMode = 'annual'; // ตัวแปรบอกสถานะโหมด
 
-    function calculatePreview() {
-        const res = calculateStats();
-        if(!res) { alert('กรุณาระบุจำนวน n ให้ถูกต้อง'); return; }
+        function updatePreset() {
+            const type = document.getElementById('wardType').value;
+            const nhppdInput = document.getElementById('nhppd');
+            if (type === 'ward_gen') nhppdInput.value = 3.5;
+            else if (type === 'icu') nhppdInput.value = 12.0;
+            else if (type === 'opd') nhppdInput.value = 0.5;
+            calculate(); 
+        }
+
+        function calcNHPPDTable() {
+            let totalPatients = 0;
+            let totalHours = 0;
+            for (let i = 1; i <= 5; i++) {
+                let pt = parseFloat(document.getElementById(`pt_${i}`).value) || 0;
+                let hr = parseFloat(document.getElementById(`hr_${i}`).value) || 0;
+                let sum = pt * hr;
+                document.getElementById(`sum_hr_${i}`).innerText = sum.toFixed(1);
+                totalPatients += pt;
+                totalHours += sum;
+            }
+            let adc = parseFloat(document.getElementById('adc').value) || 0;
+            document.getElementById('grand_total_pt').innerText = totalPatients;
+            document.getElementById('grand_total_hr').innerText = totalHours.toFixed(1);
+            let avgNHPPD = adc > 0 ? (totalHours / adc) : 0;
+            let finalAvg = avgNHPPD.toFixed(2);
+            document.getElementById('calc_nhppd_result').innerText = finalAvg;
+            document.getElementById('nhppd_formula_text').innerText = `( ${totalHours.toFixed(1)} ชม. ÷ ADC ${adc} )`;
+
+            if(totalPatients > 0 || totalHours > 0) {
+                const nhppdInput = document.getElementById('nhppd');
+                nhppdInput.value = finalAvg;
+                document.getElementById('wardType').value = 'custom';
+                const highlight = document.getElementById('nhppd_highlight');
+                highlight.classList.remove('opacity-0');
+                setTimeout(() => highlight.classList.add('opacity-0'), 600);
+                document.getElementById('sync_badge').classList.remove('hidden');
+                calculate();
+            } else {
+                document.getElementById('sync_badge').classList.add('hidden');
+            }
+        }
+
+        function resetNHPPDTable() {
+            for(let i=1; i<=5; i++) {
+                document.getElementById(`pt_${i}`).value = 0;
+            }
+            calcNHPPDTable();
+        }
+
+        function calculate() {
+            let adc = parseFloat(document.getElementById('adc').value) || 0;
+            let nhppd = parseFloat(document.getElementById('nhppd').value) || 0;
+            let constant = parseFloat(document.getElementById('constant').value) || 0;
+            let benefit = parseFloat(document.getElementById('benefit').value) || 0;
+            let hours = parseFloat(document.getElementById('workHours').value) || 1;
+            let staffPct = parseFloat(document.getElementById('staffPercentage').value) || 1; 
+
+            // 1. คำนวณยอดดิบ (Raw Requirement)
+            let baseResult = (adc * nhppd * constant * benefit) / hours;
+            
+            document.getElementById('totalStaff').innerText = baseResult.toFixed(2);
+
+            // 2. แปลงเป็น Headcount (จำนวนคน)
+            let adjustedHeadCount;
+
+            if (currentMode === 'daily') {
+                // *** กรณีรายวัน (Seamless) ***
+                adjustedHeadCount = baseResult * staffPct;
+                
+                document.getElementById('formulaDetail').innerText = 
+                    `(คำนวณจากความต้องการวันนี้ x สัดส่วนที่เลือก)`;
+            } else {
+                // *** กรณีแผนรายปี FTE ***
+                let fullHeadCount = (baseResult * 2368) / 2080;
+                adjustedHeadCount = fullHeadCount * staffPct;
+                
+                document.getElementById('formulaDetail').innerText = 
+                    `(คำนวณจาก FTE x สัดส่วนที่เลือก)`;
+            }
+
+            document.getElementById('headCountResult').innerText = adjustedHeadCount.toFixed(2);
+            document.getElementById('displayPct').innerText = Math.round(staffPct * 100);
+            
+            // 3. แบ่งเวร
+            let pM = parseFloat(document.getElementById('pctMorning').value) || 0;
+            let pA = parseFloat(document.getElementById('pctAfternoon').value) || 0;
+            let pN = parseFloat(document.getElementById('pctNight').value) || 0;
+            
+            let totalPctShift = pM + pA + pN;
+            let totalPctEl = document.getElementById('totalShiftPct');
+            totalPctEl.innerText = totalPctShift;
+            if(totalPctShift !== 100) {
+                totalPctEl.parentElement.classList.add('text-red-500');
+                totalPctEl.parentElement.classList.remove('text-blue-500');
+            } else {
+                totalPctEl.parentElement.classList.remove('text-red-500');
+                totalPctEl.parentElement.classList.add('text-blue-500');
+            }
+
+            let dailyStaff = adjustedHeadCount; 
+            document.getElementById('shiftMorning').innerText = Math.round(dailyStaff * (pM / 100));
+            document.getElementById('shiftAfternoon').innerText = Math.round(dailyStaff * (pA / 100));
+            document.getElementById('shiftNight').innerText = Math.round(dailyStaff * (pN / 100));
+            
+            calculateGap(adjustedHeadCount);
+        }
+
+        // >>>>>>>>>>> Updated: Gap & Productivity Calculation <<<<<<<<<<<
+        function calculateGap(required) {
+            // 1. ส่วนคำนวณ Gap เดิม
+            const current = parseFloat(document.getElementById('currentStaff').value);
+            const gapBox = document.getElementById('gapBox');
+            const gapResult = document.getElementById('gapResult');
+            const gapText = document.getElementById('gapText');
+
+            if (isNaN(current)) {
+                gapResult.innerText = "-";
+                gapText.innerText = "กรุณาระบุจำนวนคนจริง";
+                gapBox.className = "flex-1 w-full text-center p-2 rounded-lg bg-gray-100";
+                gapResult.className = "text-3xl font-bold text-gray-400";
+                
+                // Reset Productivity Box
+                document.getElementById('realProdResult').innerText = "- %";
+                document.getElementById('prodBox').className = "flex-1 w-full text-center p-2 rounded-lg bg-gray-50 border border-gray-200";
+                return;
+            }
+
+            const gap = current - required;
+            gapResult.innerText = gap.toFixed(2);
+
+            // Logic สีของ Gap (เดิม)
+            if (gap < -0.1) { // Shortage
+                gapBox.className = "flex-1 w-full text-center p-2 rounded-lg bg-red-100 border border-red-300 gap-alert";
+                gapResult.className = "text-3xl font-bold text-red-600";
+                gapText.innerHTML = `ขาดอัตรากำลัง <span class="font-bold">${Math.abs(gap).toFixed(2)}</span> คน`;
+            } else if (gap > 0.1) { // Surplus
+                gapBox.className = "flex-1 w-full text-center p-2 rounded-lg bg-green-100 border border-green-300";
+                gapResult.className = "text-3xl font-bold text-green-600";
+                gapText.innerText = "อัตรากำลังเพียงพอ/เกินเกณฑ์";
+            } else { // Balanced
+                gapBox.className = "flex-1 w-full text-center p-2 rounded-lg bg-blue-50 border border-blue-200";
+                gapResult.className = "text-3xl font-bold text-blue-600";
+                gapText.innerText = "อัตรากำลังพอดีตามเกณฑ์";
+            }
+
+            // ---------------------------------------------------------
+            // 2. ส่วนคำนวณ Productivity (เพิ่มใหม่)
+            // ---------------------------------------------------------
+            const adc = parseFloat(document.getElementById('adc').value) || 0;
+            const nhppd = parseFloat(document.getElementById('nhppd').value) || 0;
+            const workHours = parseFloat(document.getElementById('workHours').value) || 7;
+
+            // ภาระงานทั้งหมด (Workload Hours) = คนไข้ x เวลาที่ต้องการต่อคน
+            const totalWorkloadHours = adc * nhppd;
+            
+            // ชั่วโมงทำงานจริงที่มี (Actual Hours) = จำนวนคนจริง x ชั่วโมงทำงาน
+            const totalActualHours = current * workHours;
+
+            if (totalActualHours > 0) {
+                const productivity = (totalWorkloadHours / totalActualHours) * 100;
+                const prodBox = document.getElementById('prodBox');
+                const prodResult = document.getElementById('realProdResult');
+                const prodText = document.getElementById('realProdText');
+
+                prodResult.innerText = productivity.toFixed(0) + "%";
+
+                // แปลผล Productivity (เกณฑ์มาตรฐานสากล)
+                if (productivity > 120) {
+                    // งานล้นมือ (อันตราย)
+                    prodBox.className = "flex-1 w-full text-center p-2 rounded-lg bg-red-500 border border-red-600 text-white gap-alert";
+                    prodResult.className = "text-3xl font-bold text-white";
+                    prodText.innerText = "Overload! (งานล้นมือ)";
+                } else if (productivity > 100) {
+                    // งานหนักเกินเกณฑ์นิดหน่อย
+                    prodBox.className = "flex-1 w-full text-center p-2 rounded-lg bg-orange-100 border border-orange-300";
+                    prodResult.className = "text-3xl font-bold text-orange-600";
+                    prodText.innerText = "High (งานหนัก)";
+                } else if (productivity >= 80) {
+                    // กำลังดี (Appropriate)
+                    prodBox.className = "flex-1 w-full text-center p-2 rounded-lg bg-green-100 border border-green-300";
+                    prodResult.className = "text-3xl font-bold text-green-600";
+                    prodText.innerText = "Good (เหมาะสม)";
+                } else {
+                    // งานน้อย คนว่าง (Low Productivity)
+                    prodBox.className = "flex-1 w-full text-center p-2 rounded-lg bg-gray-200 border border-gray-300";
+                    prodResult.className = "text-3xl font-bold text-gray-600";
+                    prodText.innerText = "Low (งานน้อย/คนเหลือ)";
+                }
+            }
+        }
+
+        function exportToExcel() {
+            const unitCode = document.getElementById('unitCode').value || 'Unknown';
+            const unitName = document.getElementById('unitName').value || 'Unknown';
+            
+            const data = [
+                ["Nursing Workforce Calculation Report"],
+                ["Date", new Date().toLocaleDateString('th-TH')],
+                ["Unit Code", unitCode],
+                ["Unit Name", unitName],
+                [],
+                ["Parameters", "Value"],
+                ["ADC / Census", document.getElementById('adc').value],
+                ["NHPPD", document.getElementById('nhppd').value],
+                ["Constant", document.getElementById('constant').value],
+                ["Benefit", document.getElementById('benefit').value],
+                ["Productivity %", document.getElementById('staffPercentage').options[document.getElementById('staffPercentage').selectedIndex].text],
+                [],
+                ["Results", "Value"],
+                ["Required Headcount", document.getElementById('headCountResult').innerText],
+                ["Current Staff", document.getElementById('currentStaff').value || 0],
+                ["Gap (Diff)", document.getElementById('gapResult').innerText],
+                ["Real Productivity", document.getElementById('realProdResult').innerText]
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Report");
+            XLSX.writeFile(wb, `Staffing_Report_${unitCode}.xlsx`);
+        }
+
+        function updateChart(historyData) {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            if (myChart) myChart.destroy();
+
+            if (!historyData || historyData.length === 0) return;
+
+            const labels = historyData.map(d => d.date);
+            const dataADC = historyData.map(d => d.adc);
+            const dataStaff = historyData.map(d => d.headcount);
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Workload (ADC/Census)',
+                            data: dataADC,
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            yAxisID: 'y',
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Requirement (Staff)',
+                            data: dataStaff,
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            yAxisID: 'y1',
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: { type: 'linear', display: true, position: 'left', title: {display:true, text:'Workload'} },
+                        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, title: {display:true, text:'Staff'} }
+                    }
+                }
+            });
+        }
+
+        function saveUnit() {
+            const unitCode = document.getElementById('unitCode').value.trim();
+            if (!unitCode) {
+                alert('กรุณาระบุรหัสหน่วยงาน (Unit Code) ก่อนบันทึก');
+                return;
+            }
+            const data = {
+                unitCode: unitCode,
+                unitName: document.getElementById('unitName').value,
+                wardType: document.getElementById('wardType').value,
+                adc: document.getElementById('adc').value,
+                nhppdTable: {
+                    pt_1: document.getElementById('pt_1').value, hr_1: document.getElementById('hr_1').value,
+                    pt_2: document.getElementById('pt_2').value, hr_2: document.getElementById('hr_2').value,
+                    pt_3: document.getElementById('pt_3').value, hr_3: document.getElementById('hr_3').value,
+                    pt_4: document.getElementById('pt_4').value, hr_4: document.getElementById('hr_4').value,
+                    pt_5: document.getElementById('pt_5').value, hr_5: document.getElementById('hr_5').value
+                },
+                nhppd: document.getElementById('nhppd').value,
+                constant: document.getElementById('constant').value,
+                benefit: document.getElementById('benefit').value,
+                workHours: document.getElementById('workHours').value,
+                staffPercentage: document.getElementById('staffPercentage').value,
+                currentStaff: document.getElementById('currentStaff').value,
+                shiftPlan: {
+                    morning: document.getElementById('pctMorning').value,
+                    afternoon: document.getElementById('pctAfternoon').value,
+                    night: document.getElementById('pctNight').value
+                }
+            };
+            localStorage.setItem('nursing_app_' + unitCode, JSON.stringify(data));
+            
+            let history = JSON.parse(localStorage.getItem('nursing_history_' + unitCode) || '[]');
+            const newRecord = {
+                date: new Date().toLocaleDateString('th-TH'),
+                timestamp: Date.now(),
+                adc: parseFloat(data.adc),
+                headcount: parseFloat(document.getElementById('headCountResult').innerText)
+            };
+            history.push(newRecord);
+            if(history.length > 12) history.shift(); 
+            localStorage.setItem('nursing_history_' + unitCode, JSON.stringify(history));
+            updateChart(history);
+
+            const btn = document.activeElement;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✅ บันทึกแล้ว';
+            setTimeout(() => { btn.innerHTML = originalText; }, 1500);
+        }
+
+        function loadUnit() {
+            const unitCode = document.getElementById('unitCode').value.trim();
+            if (!unitCode) {
+                alert('กรุณาระบุรหัสหน่วยงานเพื่อค้นหา');
+                return;
+            }
+            const storedData = localStorage.getItem('nursing_app_' + unitCode);
+            if (storedData) {
+                const data = JSON.parse(storedData);
+                document.getElementById('unitName').value = data.unitName || '';
+                document.getElementById('wardType').value = data.wardType || 'custom';
+                document.getElementById('adc').value = data.adc || 0;
+                
+                if (data.nhppdTable) {
+                    document.getElementById('pt_1').value = data.nhppdTable.pt_1 || 0;
+                    document.getElementById('pt_2').value = data.nhppdTable.pt_2 || 0;
+                    document.getElementById('pt_3').value = data.nhppdTable.pt_3 || 0;
+                    document.getElementById('pt_4').value = data.nhppdTable.pt_4 || 0;
+                    document.getElementById('pt_5').value = data.nhppdTable.pt_5 || 0;
+                }
+                document.getElementById('nhppd').value = data.nhppd || 0;
+                document.getElementById('constant').value = data.constant || 1.4;
+                document.getElementById('benefit').value = data.benefit || 1.14;
+                document.getElementById('workHours').value = data.workHours || 7;
+                document.getElementById('staffPercentage').value = data.staffPercentage || 0.7;
+                document.getElementById('currentStaff').value = data.currentStaff || '';
+                if (data.shiftPlan) {
+                    document.getElementById('pctMorning').value = data.shiftPlan.morning || 40;
+                    document.getElementById('pctAfternoon').value = data.shiftPlan.afternoon || 30;
+                    document.getElementById('pctNight').value = data.shiftPlan.night || 30;
+                }
+                calcNHPPDTable();
+                calculate();
+                
+                const history = JSON.parse(localStorage.getItem('nursing_history_' + unitCode) || '[]');
+                updateChart(history);
+
+                alert('โหลดข้อมูลเรียบร้อย: ' + unitCode);
+            } else {
+                alert('ไม่พบข้อมูลสำหรับรหัส: ' + unitCode);
+            }
+        }
+
+        function deleteUnit() {
+            const unitCode = document.getElementById('unitCode').value.trim();
+            if (!unitCode) {
+                alert('กรุณาระบุรหัสหน่วยงานที่จะลบ');
+                return;
+            }
+            if (confirm('คุณต้องการลบข้อมูลของรหัส ' + unitCode + ' ใช่หรือไม่?')) {
+                localStorage.removeItem('nursing_app_' + unitCode);
+                localStorage.removeItem('nursing_history_' + unitCode);
+                clearForm();
+                alert('ลบข้อมูลเรียบร้อย');
+            }
+        }
+
+        function clearHistory() {
+            const code = document.getElementById('unitCode').value;
+            if(code && confirm('ล้างประวัติกราฟเท่านั้น?')) {
+                localStorage.removeItem('nursing_history_' + code);
+                if(myChart) myChart.destroy();
+                alert('ล้างกราฟแล้ว');
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('unitCode').value = '';
+            document.getElementById('unitName').value = '';
+            document.getElementById('wardType').value = 'custom';
+            document.getElementById('adc').value = 0;
+            resetNHPPDTable();
+            document.getElementById('nhppd').value = 0;
+            document.getElementById('constant').value = 1.4;
+            document.getElementById('benefit').value = 1.14;
+            document.getElementById('workHours').value = 7;
+            document.getElementById('staffPercentage').value = 0.7;
+            document.getElementById('currentStaff').value = '';
+            document.getElementById('pctMorning').value = 40;
+            document.getElementById('pctAfternoon').value = 30;
+            document.getElementById('pctNight').value = 30;
+            if(myChart) myChart.destroy();
+            calculate();
+        }
+
+        function autoLoad() {}
+
+        document.getElementById('unitCode').addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                loadUnit();
+            }
+        });
+
+        // --- ฟังก์ชันสลับโหมด รายปี vs รายวัน ---
+        function switchMode(mode) {
+            currentMode = mode;
+            const btnAnnual = document.getElementById('btnAnnual');
+            const btnDaily = document.getElementById('btnDaily');
+            const labelADC = document.getElementById('adcSubtext');
+            const labelStep4 = document.getElementById('step4Label');
+            const labelCurrent = document.getElementById('currentStaffLabel');
+            
+            const inpConst = document.getElementById('constant');
+            const inpBenefit = document.getElementById('benefit');
+
+            if (mode === 'daily') {
+                // --- โหมดรายวัน ---
+                btnAnnual.className = "px-6 py-2 rounded-md text-sm font-bold transition-all duration-300 text-gray-500 hover:text-gray-700 w-40";
+                btnDaily.className = "px-6 py-2 rounded-md text-sm font-bold transition-all duration-300 shadow bg-orange-500 text-white w-40";
+                
+                // ปรับค่าคงที่ให้เป็น 1 เพื่อให้สูตรคำนวณออกมาเป็นรายวัน
+                inpConst.value = 1;
+                inpBenefit.value = 1;
+                inpConst.disabled = true;
+                inpBenefit.disabled = true;
+                inpConst.classList.add('bg-gray-100', 'text-gray-400');
+                inpBenefit.classList.add('bg-gray-100', 'text-gray-400');
+
+                labelADC.innerHTML = 'จำนวนผู้ป่วยวันนี้ (Today Census)';
+                labelStep4.innerHTML = 'ความต้องการพยาบาลวันนี้ (Daily Need)';
+                labelCurrent.innerText = 'จนท.ที่ขึ้นเวรจริง (Scheduled Staff)';
+                
+                document.getElementById('totalStaff').nextElementSibling.innerText = "Staff Required (Today)";
+
+                // >>>>>> เพิ่ม: สั่งเปิด Popup ทันที <<<<<<
+                openDailyModal();
+
+            } else {
+                // --- โหมดแผนรายปี ---
+                btnAnnual.className = "px-6 py-2 rounded-md text-sm font-bold transition-all duration-300 shadow bg-white text-blue-600 w-40";
+                btnDaily.className = "px-6 py-2 rounded-md text-sm font-bold transition-all duration-300 text-gray-500 hover:text-gray-700 w-40";
+                
+                // คืนค่าคงที่มาตรฐาน FTE
+                inpConst.value = 1.4;
+                inpBenefit.value = 1.14;
+                inpConst.disabled = false;
+                inpBenefit.disabled = false;
+                inpConst.classList.remove('bg-gray-100', 'text-gray-400');
+                inpBenefit.classList.remove('bg-gray-100', 'text-gray-400');
+
+                labelADC.innerHTML = 'Average Daily Census (คน/วัน)';
+                labelStep4.innerHTML = 'ขั้นตอนที่4 อัตรากำลัง FTE ที่ต้องการ (100%)';
+                labelCurrent.innerText = 'จำนวนคนที่มีอยู่จริง (Current Staff)';
+                
+                document.getElementById('totalStaff').nextElementSibling.innerText = "Full Time Equivalent";
+            }
+            calculate();
+        }
+
+        function generatePDF() {
+            document.getElementById('rptDate').innerText = new Date().toLocaleDateString('th-TH');
+            document.getElementById('rptUnitName').innerText = document.getElementById('unitName').value || '-';
+            document.getElementById('rptUnitCode').innerText = document.getElementById('unitCode').value || '-';
+            const wtMap = {
+                'custom': 'กำหนดเอง',
+                'ward_gen': 'หอผู้ป่วยสามัญ (General)',
+                'icu': 'หอผู้ป่วยวิกฤต (ICU)',
+                'opd': 'ผู้ป่วยนอก (OPD)'
+            };
+            document.getElementById('rptWardType').innerText = wtMap[document.getElementById('wardType').value] || '-';
+            
+            document.getElementById('rptADC').innerText = document.getElementById('adc').value;
+            document.getElementById('rptNHPPD').innerText = document.getElementById('nhppd').value;
+            document.getElementById('rptConstant').innerText = document.getElementById('constant').value;
+            const pctVal = parseFloat(document.getElementById('staffPercentage').value) * 100;
+            document.getElementById('rptProd').innerText = Math.round(pctVal) + '%';
+            document.getElementById('rptPctDisplay').innerText = Math.round(pctVal) + '%';
+
+            document.getElementById('rptFTE').innerText = document.getElementById('totalStaff').innerText;
+            document.getElementById('rptHeadcount').innerText = document.getElementById('headCountResult').innerText;
+            
+            document.getElementById('rptCurrent').innerText = document.getElementById('currentStaff').value || '-';
+            document.getElementById('rptRequired').innerText = document.getElementById('headCountResult').innerText;
+            document.getElementById('rptGap').innerText = document.getElementById('gapResult').innerText;
+
+            const element = document.getElementById('reportContent');
+            element.classList.remove('hidden'); 
+
+            const opt = {
+                margin:       10,
+                filename:     `Nursing_Report_${document.getElementById('unitCode').value || 'Draft'}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.classList.add('hidden'); 
+            });
+        }
         
-        const box = document.getElementById('resultBox');
-        box.style.display = 'block';
-        document.getElementById('ciText').innerText = `[ ${res.lower.toFixed(2)} , ${res.upper.toFixed(2)} ]`;
-        document.getElementById('interpretText').innerHTML = res.isSig 
-            ? `<span style="color:#059669; background:#d1fae5; padding:4px 10px; border-radius:10px;">✨ Significant (แตกต่างกันจริง)</span>`
-            : `<span style="color:#718096; background:#edf2f7; padding:4px 10px; border-radius:10px;">Not Significant (ไม่แตกต่าง)</span>`;
+        // --- ฟังก์ชันสำหรับ Modal รายวัน (อัปเดตใหม่) ---
+    function openDailyModal() {
+        // 1. ดึงข้อมูลจำนวนคนไข้จากหน้าหลัก
+        for(let i=1; i<=5; i++) {
+            document.getElementById(`d_pt_${i}`).value = document.getElementById(`pt_${i}`).value;
+        }
+        
+        // 2. ดึงค่า Productivity จากหน้าหลัก
+        let mainPct = document.getElementById('staffPercentage').value;
+        document.getElementById('d_staffPercentage').value = mainPct;
+
+        // >>> ใหม่: ดึงค่า % เวรจากหน้าหลักมาเป็นค่าเริ่มต้นใน Modal <<<
+        document.getElementById('d_pct_m').value = document.getElementById('pctMorning').value;
+        document.getElementById('d_pct_a').value = document.getElementById('pctAfternoon').value;
+        document.getElementById('d_pct_n').value = document.getElementById('pctNight').value;
+
+        // 3. คำนวณทันที
+        calcDaily();
+        // 4. แสดง Modal
+        document.getElementById('dailyModal').classList.remove('hidden');
     }
 
-    // --- CRUD ---
-    function saveData() {
-        const res = calculateStats();
-        if(!res) { alert('ข้อมูลไม่ครบถ้วน'); return; }
+    function calcDaily() {
+        // 1. คำนวณ NHPPD รวม
+        let totalHr = 0;
+        let totalPt = 0;
         
-        const pi = document.getElementById('piName').value || 'ไม่ระบุชื่อ';
-        const title = document.getElementById('titleName').value || 'ไม่ระบุชื่อเรื่อง';
-        const editId = document.getElementById('editId').value;
-
-        const record = {
-            id: editId ? parseInt(editId) : Date.now(),
-            pi: pi, co: [...currentCoResearchers], title: title,
-            stats: { 
-                m1: document.getElementById('m1').value, 
-                sd1: document.getElementById('sd1').value, 
-                n1: document.getElementById('n1').value,
-                m2: document.getElementById('m2').value, 
-                sd2: document.getElementById('sd2').value, 
-                n2: document.getElementById('n2').value 
-            },
-            result: { lower: res.lower.toFixed(2), upper: res.upper.toFixed(2), isSig: res.isSig }
+        const hoursMap = {
+            1: parseFloat(document.getElementById('hr_1').value) || 1.5, 
+            2: parseFloat(document.getElementById('hr_2').value) || 3.5, 
+            3: parseFloat(document.getElementById('hr_3').value) || 5.5, 
+            4: parseFloat(document.getElementById('hr_4').value) || 7.5, 
+            5: parseFloat(document.getElementById('hr_5').value) || 12.0
         };
 
-        if(editId) {
-            const idx = researchData.findIndex(r => r.id == editId);
-            if(idx !== -1) researchData[idx] = record;
+        for(let i=1; i<=5; i++) {
+            let pt = parseFloat(document.getElementById(`d_pt_${i}`).value) || 0;
+            totalPt += pt;
+            totalHr += pt * hoursMap[i];
+        }
+
+        document.getElementById('d_census').value = totalPt;
+        document.getElementById('d_total_hours').value = totalHr.toFixed(1);
+
+        // 2. คำนวณจำนวนคนต้องการ (Headcount)
+        let workHrs = parseFloat(document.getElementById('workHours').value) || 7;
+        if (workHrs < 4) workHrs = 7; 
+        
+        let pct = parseFloat(document.getElementById('d_staffPercentage').value) || 1; 
+        
+        let rawStaff = totalHr / workHrs;
+        let finalStaff = rawStaff * pct; 
+        
+        document.getElementById('d_staff_result').innerText = finalStaff.toFixed(1);
+
+        document.getElementById('d_formula_explain').innerHTML = 
+            `( <span class="text-yellow-400">${totalHr.toFixed(1)}</span> ชม. ÷ ${workHrs} ชม. ) × ${Math.round(pct*100)}%`;
+
+        // >>> ใหม่: คำนวณเวร ตาม % ที่กรอกใน Modal <<<
+        let pM = parseFloat(document.getElementById('d_pct_m').value) || 0;
+        let pA = parseFloat(document.getElementById('d_pct_a').value) || 0;
+        let pN = parseFloat(document.getElementById('d_pct_n').value) || 0;
+
+        // เช็คยอดรวม % เพื่อแสดงสีเตือน
+        let totalShiftPct = pM + pA + pN;
+        let pctBox = document.getElementById('d_total_pct_box');
+        document.getElementById('d_total_pct_val').innerText = totalShiftPct;
+        
+        if(totalShiftPct !== 100) {
+            pctBox.classList.add('border-red-500', 'text-red-600');
+            pctBox.classList.remove('border-green-500', 'text-green-600');
         } else {
-            researchData.push(record);
+            pctBox.classList.remove('border-red-500', 'text-red-600');
+            pctBox.classList.add('border-green-500', 'text-green-600');
         }
 
-        localStorage.setItem('researchData', JSON.stringify(researchData));
-        renderTable();
-        resetForm();
-    }
-
-    function renderTable() {
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-        [...researchData].sort((a,b) => b.id - a.id).forEach(item => {
-            const tr = document.createElement('tr');
-            const coTxt = item.co.length ? `<div style="font-size:0.8rem; color:#a0aec0;">+ ${item.co.join(', ')}</div>` : '';
-            
-            tr.innerHTML = `
-                <td>
-                    <div style="font-weight:600; color:#2d3748;">${item.title}</div>
-                    <div style="font-size:0.85rem; color:#718096;">${item.pi}</div>
-                    ${coTxt}
-                </td>
-                <td style="font-size:0.9rem;">
-                   <span style="color:var(--accent)">n=${item.stats.n1}</span> vs <span style="color:#718096">n=${item.stats.n2}</span>
-                </td>
-                <td style="font-family:'Prompt'; font-weight:600; color:#2d3748;">
-                    ${item.result.lower}, ${item.result.upper}
-                </td>
-                <td>
-                    ${item.result.isSig ? '<span style="color:#059669; font-weight:bold;">Sig</span>' : '<span style="color:#a0aec0;">NS</span>'}
-                </td>
-                <td class="no-print" style="text-align:right;">
-                    <button onclick="loadEdit(${item.id})" style="border:none; background:none; cursor:pointer; color:#fbbf24; font-size:1.1rem; margin-right:5px;"><i class="ph ph-pencil-simple"></i></button>
-                    <button onclick="delItem(${item.id})" style="border:none; background:none; cursor:pointer; color:#f87171; font-size:1.1rem;"><i class="ph ph-trash"></i></button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    function delItem(id) {
-        if(confirm('ลบข้อมูลนี้?')) {
-            researchData = researchData.filter(r => r.id !== id);
-            localStorage.setItem('researchData', JSON.stringify(researchData));
-            renderTable();
-        }
-    }
-
-    function loadEdit(id) {
-        const item = researchData.find(r => r.id === id);
-        if(!item) return;
-        document.getElementById('editId').value = item.id;
-        document.getElementById('piName').value = item.pi;
-        document.getElementById('titleName').value = item.title;
-        currentCoResearchers = [...item.co]; renderTags();
+        // คำนวณจำนวนคนในแต่ละเวร
+        let m = Math.round(finalStaff * (pM / 100));
+        let a = Math.round(finalStaff * (pA / 100));
+        let n = Math.round(finalStaff * (pN / 100));
         
-        document.getElementById('m1').value = item.stats.m1; document.getElementById('sd1').value = item.stats.sd1; document.getElementById('n1').value = item.stats.n1;
-        document.getElementById('m2').value = item.stats.m2; document.getElementById('sd2').value = item.stats.sd2; document.getElementById('n2').value = item.stats.n2;
-        
-        calculatePreview();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        document.getElementById('d_shift_m').innerText = m;
+        document.getElementById('d_shift_a').innerText = a;
+        document.getElementById('d_shift_n').innerText = n;
     }
 
-    function resetForm() {
-        document.getElementById('editId').value = '';
-        document.querySelectorAll('input').forEach(i => i.value = (i.type=='number'?0:''));
-        currentCoResearchers = []; renderTags();
-        document.getElementById('resultBox').style.display = 'none';
+    // ฟังก์ชันปิดหน้าต่าง Pop-up (ต้องมีส่วนนี้ ปุ่มปิดถึงจะทำงาน)
+    function closeDailyModal() {
+        document.getElementById('dailyModal').classList.add('hidden');
     }
-</script>
-
+    </script> 
 </body>
 </html>
