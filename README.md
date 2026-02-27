@@ -14,7 +14,7 @@ Nursing Workforce Calculation System (NWFC)
 
 โปรแกรมคอมพิวเตอร์ (Web Application / Progressive Web App)
 
-
+ผลงานลิขสิทธิ์ทะเบียนข้อมูลเลขที่ ว1.000136 กรมทรัพย์สินทางปัญญา
 ---
 
 1. ความเป็นมาและความสำคัญของปัญหา
